@@ -16,7 +16,7 @@
   // Layout constants (stage is 1600 × 900).
   const CX = 790;
   const ACTIVE_X = [CX - 100, CX + 100], READY_X = [CX - 200, CX, CX + 200];
-  const AW = 136, AH = 190, RW = 92, RH = 130, HW = 130;
+  const AW = 136, AH = 190, RW = 92, RH = 130, HW = 150;
 
   const WAIT = {
     roll: 950, damage: 520, attack: 420, favour: 1000, defeated: 650, die: 350, turn: 1100, phase: 280, status: 650,
@@ -138,6 +138,7 @@
 
   function render(view) {
     UI.view = view;
+    if (UI.setup && view.phase !== 'setup') UI.setup = null; // never leave placement mode on after setup
     const before = captureRects();
     const me = view.players[UI.me], opp = view.players[1 - UI.me];
 
@@ -211,6 +212,10 @@
     let dual = 0;
     for (const s of untapped) { const e = def(s).energy; if (e.length === 1) counts[e[0]]++; else dual++; }
     box.innerHTML = P.support.map(s => R.supportTile(s).replace('class="stile', 'data-flip="' + s.uid + '" class="stile')).join('');
+    // Tiles are as big as the zone allows, shrinking only when there are many of them.
+    const cap = sel === '#me-support' ? 12 : 8;
+    box.classList.toggle('dense', P.support.length > cap && P.support.length <= cap * 1.25);
+    box.classList.toggle('denser', P.support.length > cap * 1.25);
     const sum = Object.keys(counts).filter(t => counts[t]).map(t => R.pip(t) + counts[t]).join(' ') + (dual ? ' <span class="dual">+' + dual + ' dual</span>' : '');
     $(sel + ' .zlabel').innerHTML = (sel === '#me-support' ? 'Your Support Zone' : 'Opponent Support') +
       ' <span class="energy-sum">' + untapped.length + '/' + P.support.length + ' ready ' + (sum ? '· ' + sum : '') + '</span>';
@@ -222,14 +227,16 @@
     if (mine && UI.setup) cards = cards.filter(c => !UI.setup.some(x => x.uid === c.uid));
     const n = cards.length;
     const w = mine ? HW : 70;
-    const spread = mine ? Math.min(112, 760 / Math.max(1, n)) : Math.min(46, 400 / Math.max(1, n));
+    const spread = mine ? Math.min(140, 820 / Math.max(1, n)) : Math.min(46, 400 / Math.max(1, n));
     box.innerHTML = cards.map((c, i) => {
       const off = i - (n - 1) / 2;
       const x = CX + off * spread - w / 2;
       const rot = off * (mine ? 2.6 : -2.6);
-      const y = mine ? 790 + Math.abs(off) * Math.abs(off) * 1.6 : -66 - Math.abs(off) * Math.abs(off) * 1.2;
+      const y = mine ? 778 + Math.abs(off) * Math.abs(off) * 1.4 : -66 - Math.abs(off) * Math.abs(off) * 1.2;
       const inner = mine && !c.hidden ? R.card(c.id, { uid: c.uid, w: HW, cls: 'in-hand' }) : R.back({ uid: c.uid, w: 70 });
-      return '<div class="hand-card" data-flip="' + c.uid + '" data-hand-uid="' + c.uid + '" style="left:' + x + 'px;top:' + y + 'px;transform:rotate(' + rot + 'deg);z-index:' + (10 + i) + '">' + inner + '</div>';
+      // The outer box keeps its place while the inner card lifts on hover, so the card never slides out from under the pointer.
+      return '<div class="hand-card" data-flip="' + c.uid + '" data-hand-uid="' + c.uid + '"' + (mine && !c.hidden ? ' data-card-id="' + c.id + '"' : '') +
+        ' style="left:' + x + 'px;top:' + y + 'px;--rot:' + rot + 'deg;transform:rotate(' + rot + 'deg);z-index:' + (10 + i) + '">' + inner + '</div>';
     }).join('');
   }
 
@@ -366,7 +373,7 @@
         for (const u of E.arenaUnits(P)) {
           const a = { type: 'shift', cardUid: uid, onto: u.uid };
           const e = legal(a);
-          if (E.baseName(u) === d.baseName && u.id !== c.id && (v.phase === 'resolving' || !e)) opts.push({ label: '⧉ Shift onto ' + def(u).name, action: a, dropEl: unitEl(u.uid), disabled: !!e, reason: e, cost: d.shift.cost });
+          if (E.baseName(u) === d.baseName && u.id !== c.id) opts.push({ label: '⧉ Shift onto ' + def(u).name, action: a, dropEl: unitEl(u.uid), disabled: !!e, reason: e, cost: d.shift.cost });
         }
       }
     } else {
@@ -449,7 +456,6 @@
       const a = { type: 'shift', cardUid: uid, onto: u.uid };
       if (!legal(a)) targets.push({ el: unitEl(u.uid), action: a });
     }
-    if (v.phase !== 'resolving' && !targets.length) return [];
     const ontoBase = E.arenaUnits(P).find(u => E.baseName(u) === d.baseName && u.id !== d.id);
     const probe = d.shift.ontoOnly && ontoBase ? legal({ type: 'shift', cardUid: uid, onto: ontoBase.uid })
       : d.shift.ontoOnly ? 'Needs ' + d.baseName + ' in your Arena to Shift onto.'
@@ -924,7 +930,7 @@
     };
     $('[data-auto]', p).onclick = () => {
       UI.setup = [];
-      const units = view.players[UI.me].hand.filter(E.isUnitCard).sort((a, b) => def(b).hp - def(a).hp).slice(0, 3);
+      const units = view.players[UI.me].hand.filter(c => E.isUnitCard(c) && !E.shiftOnly(c)).sort((a, b) => def(b).hp - def(a).hp).slice(0, 3);
       units.forEach((c, i) => UI.setup.push({ uid: c.uid, id: c.id, zone: i < 2 ? 'active' : 'ready', index: i < 2 ? i : 1 }));
       render(UI.view); upd();
     };
@@ -947,6 +953,7 @@
     if (!handEl) return;
     const c = v.players[UI.me].hand.find(x => x.uid === handEl.dataset.handUid);
     if (!E.isUnitCard(c)) { toast('Only fighters and characters can be placed.', 'error'); return; }
+    if (E.shiftOnly(c)) { toast(def(c).name + ' is a Shifted form: it can only enter the Arena by Shifting.', 'error'); return; }
     // Drag to a specific slot, or click to auto-place.
     e.preventDefault();
     const start = stagePoint(e);

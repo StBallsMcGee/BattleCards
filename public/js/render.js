@@ -33,8 +33,9 @@
   }
 
   /** Card art: the generated illustration, with the emoji as a fallback if the image is missing. */
+  function artUrl(d) { return (self.BCArt && self.BCArt[d.id]) || 'art/' + d.id + '.svg'; }
   function art(d) {
-    return '<div class="c-art"><span class="c-emoji">' + d.art + '</span><img class="c-img" src="' + ((self.BCArt && self.BCArt[d.id]) || 'art/' + d.id + '.svg') + '" alt="" loading="lazy" onerror="this.remove()"></div>';
+    return '<div class="c-art"><span class="c-emoji">' + d.art + '</span><img class="c-img" src="' + artUrl(d) + '" alt="" loading="lazy" onerror="this.remove()"></div>';
   }
 
   function attackHTML(a, i, opts) {
@@ -122,9 +123,13 @@
   function supportTile(s, opts) {
     const d = C.byId[s.id];
     opts = opts || {};
-    return '<div class="stile ' + frameClass(d) + (s.tapped ? ' tapped' : '') + ' ' + (opts.cls || '') + '" data-uid="' + s.uid + '" data-card-id="' + s.id + '">' +
-      '<span class="st-emoji">' + d.art + '</span><span class="st-energy">' + pips(d.energy) + '</span>' +
-      '<span class="st-name">' + esc(d.name.split(',')[0]) + '</span></div>';
+    // Characters show their full version name (e.g. "Valeria, Champion of the Pit") so versions can be told apart.
+    const name = d.type === 'character' ? d.name : d.name.split(',')[0];
+    return '<div class="stile ' + frameClass(d) + (s.tapped ? ' tapped' : '') + (d.shift ? ' can-shift' : '') + ' ' + (opts.cls || '') + '" data-uid="' + s.uid + '" data-card-id="' + s.id + '">' +
+      '<span class="st-art"><span class="st-emoji">' + d.art + '</span><img src="' + artUrl(d) + '" alt="" loading="lazy" onerror="this.remove()"></span>' +
+      (d.shift ? '<span class="st-shift" title="Can Shift">⧉</span>' : '') +
+      '<span class="st-energy">' + pips(d.energy) + '</span>' +
+      '<span class="st-name">' + esc(name) + '</span></div>';
   }
 
   function back(opts) {

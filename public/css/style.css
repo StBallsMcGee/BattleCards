@@ -170,8 +170,13 @@ code { background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 5px; 
 .hand-card.can-act > .card { box-shadow: 0 0 0 3px #7ee2a8, 0 0 18px #7ee2a8aa; }
 
 .hand { position: absolute; inset: 0; pointer-events: none; }
-.hand-card { position: absolute; pointer-events: auto; transition: transform .16s ease, top .2s; transform-origin: 50% 100%; cursor: grab; }
-#me-hand .hand-card:hover { transform: translateY(-150px) scale(1.45) rotate(0deg) !important; z-index: 300 !important; }
+.hand-card { position: absolute; pointer-events: auto; transition: top .2s; transform-origin: 50% 100%; cursor: grab; }
+.hand-card > .card { transition: transform .16s ease; transform-origin: 50% 100%; }
+/* Hovering lifts and straightens the inner card; the outer hit box stays put (no flicker). */
+#me-hand .hand-card:hover { z-index: 300 !important; }
+#me-hand .hand-card:hover > .card { transform: rotate(calc(-1 * var(--rot, 0deg))) translateY(-150px) scale(1.5); box-shadow: 0 18px 40px #000c; }
+/* While hovered, the hit area also covers the lifted card, so moving onto it keeps it raised. */
+#me-hand .hand-card:hover::after { content: ''; position: absolute; left: -25%; right: -25%; top: -120%; bottom: 0; }
 .hand-card.dragging { opacity: .3; }
 .drag-ghost { position: absolute; pointer-events: none; z-index: 500; transform: rotate(-4deg) scale(1.05) !important; opacity: .92; filter: drop-shadow(0 12px 18px #000a); }
 
@@ -197,21 +202,35 @@ code { background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 5px; 
 .pile.handc { font-size: 26px; color: var(--muted); }
 .empty-pile { width: 34px; height: 48px; border: 1px dashed #fff3; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: #fff4; }
 
-.support { position: absolute; left: 16px; width: 304px; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 6px 8px; }
+.support { position: absolute; left: 16px; width: 304px; display: flex; flex-direction: column; background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.08); border-radius: 14px; padding: 6px 8px; }
 .support.opp { top: 146px; height: 236px; } .support.me { top: 446px; height: 304px; }
 .zlabel { font-size: 11px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
 .zlabel .hint { text-transform: none; font-weight: 400; }
 .energy-sum { text-transform: none; font-weight: 600; color: var(--ink); font-size: 12px; display: inline-flex; gap: 3px; align-items: center; }
 .energy-sum .pip { font-size: 10px; }
 .energy-sum .dual { color: var(--muted); }
-.stiles { display: flex; flex-wrap: wrap; gap: 5px; }
-.stile { position: relative; width: 52px; height: 66px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3px 2px;
+.stiles { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 6px; flex: 1; min-height: 0; padding: 6px 4px 2px; overflow-y: auto; scrollbar-width: thin; }
+.stile { position: relative; width: 64px; height: 78px; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3px 2px;
   background: linear-gradient(160deg, color-mix(in srgb, var(--ec) 70%, #fff), color-mix(in srgb, var(--ec2, var(--ec)) 60%, #000)); border: 2px solid #fff4;
   box-shadow: 0 2px 6px #0007; transition: transform .25s, opacity .25s; cursor: default; font-size: 10px; }
 .stile.tapped { transform: rotate(90deg) scale(.82); opacity: .45; filter: grayscale(.6); }
+#me-support .stile { cursor: pointer; }
+#me-support .stile:not(.tapped):hover { transform: translateY(-3px) scale(1.06); z-index: 5; }
+.stile.can-act { animation: pulse-t 1.4s infinite; }
+.st-art { position: relative; width: 100%; height: 34px; border-radius: 5px; overflow: hidden; background: #0004; display: flex; align-items: center; justify-content: center; }
+.st-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .st-emoji { font-size: 20px; line-height: 1; }
+.st-shift { position: absolute; top: -5px; right: -5px; width: 17px; height: 17px; border-radius: 50%; background: #2a1f3d; border: 1.5px solid var(--gold); color: var(--gold); font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 900; }
 .st-energy { display: flex; gap: 1px; font-size: 11px; }
-.st-name { font-size: 8px; font-weight: 800; color: #fff; text-shadow: 0 1px 2px #000; white-space: nowrap; overflow: hidden; max-width: 48px; text-overflow: ellipsis; }
+.st-name { font-size: 9px; line-height: 1.1; font-weight: 800; color: #fff; text-shadow: 0 1px 2px #000; text-align: center; max-width: 62px; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.stiles.dense .stile { width: 52px; height: 64px; }
+.stiles.dense .st-art { height: 26px; }
+.stiles.dense .st-name { font-size: 8px; max-width: 48px; -webkit-line-clamp: 1; }
+.stiles.denser { gap: 4px; }
+.stiles.denser .stile { width: 42px; height: 56px; padding: 2px 1px; }
+.stiles.denser .st-art { height: 22px; }
+.stiles.denser .st-name { display: none; }
 
 #center-band { position: absolute; left: 350px; width: 880px; top: 378px; height: 60px; display: flex; align-items: center; justify-content: center; pointer-events: auto; z-index: 20; }
 .declared { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
