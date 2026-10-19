@@ -1,0 +1,13 @@
+{
+  "name": "battle-cards",
+  "version": "1.0.0",
+  "description": "Battle Cards — Gladiators of the Multiverse: browser card game with rules engine, bots, tutorial and online play",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/rules.test.js",
+    "simulate": "node tests/simulate.js 100"
+  },
+  "engines": { "node": ">=18" }
+}
