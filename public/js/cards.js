@@ -1,9 +1,10 @@
 /*
  * Battle Cards — card database and preset decks.
  *
- * This is the one file to edit when adding or changing cards. The engine,
- * the card renderer and the bots all read these definitions, and card text is
- * generated from the structured fields, so you never write rules text by hand.
+ * Cards live here (the starter set) and in js/sets/*.js (one file per faction
+ * deck). The engine, the card renderer and the bots all read these definitions.
+ * Keywords, costs, damage and Shift text are generated from the data; abilities
+ * that go beyond the rulebook keywords carry a short `text` for the card face.
  *
  * Energy types:  M = Martial, A = Arcane, T = Tactical, S = Scientific
  *
@@ -18,27 +19,61 @@
  *   armour      optional { M: 1 } — reduce damage of that type from each attack
  *   faction     optional faction tag (faction mechanics are not in the rulebook yet)
  *   attacks     [{ name, cost: ['M','T'], damage, salvo, keywords: [...] }]
- *                 salvo: X     -> "Salvo (X)": the attack deals Xd6 instead of `damage`
+ *                 salvo: X     -> "Salvo (X)": the attack rolls Xd6 and adds `damage`
  *                 keywords     -> Blinding, Brutal, Burn, Confuse, Headshot, Long Ranged,
  *                                 Poison, Counterattack, Intervention,
  *                                 Meditate, Sharpen, Strategize, Calibrate
  *   abilities   activated abilities, once per turn each:
  *                 [{ name, cost: [], effect: { type: 'token', token: 'A' } }]
- *   shift       characters only: { cost: [...], condition: {...}, ontoOnly: bool }
- *                 condition types: { type: 'favour', min }        you have at least N Favour
- *                                  { type: 'targetDamage', min }  the character shifted onto has N+ damage
- *                                  { type: 'targetTokens', min }  the character shifted onto has N+ tokens
- *                 ontoOnly: true -> may only Shift on top of a matching character
- *                                   (not from the Support Zone into an empty slot)
+ *   shift       characters only: { cost: [...], cond: <condition>, ontoOnly: bool }
+ *                 ontoOnly: true -> a Shifted form: may only Shift on top of a matching unit, and can
+ *                                   only enter the Arena that way (never played straight to the Ready Zone)
  *   art         emoji used as placeholder card art
  *   flavor      flavour text
  *
  * Power Up fields
- *   target      'ownUnit' | 'ownActive' | 'ownGraveUnit' | 'oppSupport' | 'ownSupportFighter' | 'none'
- *   effect      { type: 'tokens', token, n } | { type: 'cleanse' } | { type: 'heal', n }
- *               { type: 'draw', n } | { type: 'attach', bonusDamage, grant } | { type: 'retreat' }
- *               { type: 'favour', n, requireActiveCharacter } | { type: 'recall' }
- *               { type: 'tapSupport' } | { type: 'reinforce' }
+ *   target      who/what it is played on: 'none' | 'ownUnit' | 'ownActive' | 'ownReadyUnit' | 'ownCharacter' |
+ *               'ownShiftedChar' | 'ownFighter' | 'ownGraveUnit' | 'ownGraveUnitToReady' | 'ownSupportUnit' |
+ *               'ownSupportFighter' | 'ownLoyalCrew' | 'oppUnit' | 'oppActive' | 'oppCharacter' | 'oppSupport'
+ *   effects     list of effects (see below), with `target` = the chosen unit; `text` describes it on the card
+ *   requires    optional condition that must hold to play it (+ requiresText)
+ *   (starter-set Power Ups use the older single `effect: { type, … }` form)
+ *
+ * ───────── Effect language (used by the deck sets in js/sets/) ─────────
+ * Attack extras:  aoe: true (hits every enemy Active unit) · splash: n (n damage to the other enemy Active unit)
+ *                 collateral: { n, all } (damage to your own units) · noDamage: true · text: 'rules text'
+ *                 effects: [...] run after the hit · mods: [...] change the damage:
+ *                   { type: 'targetStatusDice', status } · { type: 'ifTargetTokens', token, min, mult }
+ *                   { type: 'vsStatusMult', statuses, mult } · { type: 'vsStatusAdd', statuses, add }
+ *                   { type: 'arenaTokens', token, per } · { type: 'perStage', per } · { type: 'ifArena', cond, add }
+ *                   { type: 'spendTokens', token, per } · { type: 'optionalSpend', token, setDamage }
+ *                   { type: 'discardSelfTokens', token, per } · { type: 'killIfTokens', token, min } · { type: 'ifFriendlyChar', dice }
+ * Abilities:      { name, cost, selfDamage, effects, text } — Arming phase, once per turn
+ * Triggers:       { on, cond, effects, text } with on = turnStart | death | kill | damaged | enemyDamaged |
+ *                 enemyKilled | enter | shiftedInto | allyShift | parried | attack
+ * Passives:       { type: 'untargetableWhile', cond } | { type: 'reducePerToken', token, per, max } |
+ *                 { type: 'doubleAttack' } | { type: 'noRetreat' }   (+ text)
+ * Transform:      { into: '<card id>', cond, condText } — a flip card turns into its other side (flipSide: true)
+ * Effects:        { do: 'tokens', token ('M'…'V' or 'choose'), n (or 'double'), to } · { do: 'damage', n, to }
+ *                 { do: 'heal', n | 'd6', to } · { do: 'status', status, to } · { do: 'chooseStatus', options, to }
+ *                 { do: 'cleanse', statuses, to } · { do: 'mark', mark, dur: 'turn'|'next'|'next2', to, data }
+ *                 { do: 'removeTokens', token, n, to, damagePer, moveTo } · { do: 'moveToken', token }
+ *                 { do: 'distributeTokens', token, n, to } · { do: 'draw', n } · { do: 'favour', n }
+ *                 { do: 'destroy', to } · { do: 'recall' } · { do: 'fromSupport', activeIf } · { do: 'toReady' }
+ *                 { do: 'toActive', to } · { do: 'hpBonus', n, to } · { do: 'flag', flag, who, dur } · { do: 'counter', name }
+ *                 any effect may carry `if: <condition>`; tokens/draw may carry nIf: { cond, n }
+ * Targets (to):   self · target · attacker · sovereign · allFriendly · otherFriendly · otherFriendlyActive ·
+ *                 friendlyCharsActive · allEnemies · enemyActive · otherEnemyActive · allUnits · randomEnemy ·
+ *                 randomEnemyActive · randomOtherFriendly · pickFriendly · pickOtherFriendly · pickEnemy ·
+ *                 pickEnemyActive · pickAny · pickReadyFriendly · ablazeEnemies · enemyMostE · named:<base name>
+ * Conditions:     { k: 'favour'|'oppFavour'|'targetDamage'|'targetTokens'|'selfTokens'|'hitTokens'|'arenaTokens'|
+ *                 'selfKills'|'voidGained'|'hpAtMost'|'counter'|'spent'|'pressure'|'enemyKills'|'allyDeaths'|'stage'|
+ *                 'twoCharsActive'|'charActive'|'friendlyOtherActive'|'friendlyFighterActive'|'inArena'|'bothAttacked'|
+ *                 'killed'|'isReaction'|'targetIsCharacter'|'targetStatus', … } · { k: 'any'|'all', of: [...] } · [a, b] = all
+ * Marks:          untargetable · taunt · noReact · guard { protect: 'sovereign'|'others' } · undying · weakened ·
+ *                 noAttack · bonusDie { n } · plusDamage { n } · unparryable · grantParry · interveneAny ·
+ *                 freeAttack · canShiftNow · ignoreShiftCond · shiftOnKill · regen { n }
+ * Token kinds:    M A T S (energy) · E Evidence · P Pressure · V Void (counters, not energy)
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();

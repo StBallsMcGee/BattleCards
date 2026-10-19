@@ -17,6 +17,7 @@ Open the address in a browser and choose **Play Online → Create Room**. Your o
 
 ## Features
 
+- **Five deck sets from your concept doc** plus four starter decks: 183 cards in total, each with a generated illustration.
 - **Rules engine** (`public/js/engine.js`). It implements every section of the rulebook: setup with simultaneous face-down placement and mulligans, the Arming, Fighting and Resolving phases, energy with tapping and dual types, energy tokens, all attack, reaction, unit and token keywords, the four statuses, Shift, Veteran, all six Favour sources, the three win conditions, draws, and the 7-card hand limit. Each decision either player has to make pauses the engine until that player answers, including decisions during the opponent's turn: spending tokens to negate damage, counterattacking or intervening, triggering a Veteran.
 - **Game board** in the style of Hearthstone and MTG Arena. You can drag cards from your hand onto zones, or click a card for its action menu. It draws attack arrows, rolls animated dice, shows floating damage numbers and banners, and animates cards between zones. Hover any card for a large preview with explanations of its keywords and statuses. The board also shows a phase tracker, a per-turn limit tracker, a game log, a graveyard viewer and synthesized sound effects.
 - **Tutorial**: a scripted 25-step lesson against Instructor Brutus. It covers setup, energy, Ready plays, Power Ups and tokens, declaring and resolving attacks, Defeat, Poison, dual energy, Parry, Counterattack, Brutal and Favour, then continues as free play.
@@ -41,26 +42,78 @@ public/js/render.js    card faces
 public/js/tutorial.js  tutorial script
 public/js/controllers.js  local (bot) and remote (server) game controllers
 public/js/deckbuilder.js, main.js, rules.js, sound.js
-tests/rules.test.js    22 rule-scenario tests
+tests/rules.test.js    30 rule-scenario tests
+tests/balance.js       deck-vs-deck balance report
+tools/gen-art.js       generates the card illustrations
+public/js/sets/        the five concept-doc deck sets
+public/art/            card illustrations (SVG)
 tests/simulate.js      bot-vs-bot simulator (crash testing + balance data)
 ```
 
+## Decks
+
+There are nine preconstructed decks, all selectable for you or for a bot:
+
+| Deck | Source | Theme |
+|---|---|---|
+| **The Elementals** | your concept doc | Portal knights; every unit shares tokens through Resonance |
+| **The Threshold Bureau** | your concept doc | Detectives who seed and spend Evidence tokens |
+| **The Apex Syndicate** | your concept doc | Sovereign's five-stage escalation behind expendable handlers |
+| **Abyssal Octo-Autons** | your concept doc | Explorer crew who Shift into Nightmare forms when both Active units attack |
+| **The Hollowing** | your concept doc | Creatures that absorb Void tokens until they cross a threshold and Shift |
+| Steel & Strategy, Arcane Storm, Vault Breakers, Shadow Bureau | my placeholder starter set | |
+
+Each concept deck's cards live in their own file in `public/js/sets/`, and all of them appear in the deck builder, which has a set filter.
+
 ## Adding and editing cards
 
-The rulebook doesn't list any cards, so I designed **53 placeholder cards** to cover every mechanic: 29 fighters, 10 character versions across 5 characters, and 14 Power Ups. There are also 4 preset decks. The art is emoji.
+All card data lives in `public/js/cards.js` (the starter set) and `public/js/sets/*.js` (one file per faction). The schema and the **effect language** are documented at the top of `cards.js`. Keywords, costs, damage, Shift conditions, triggers (`turnStart`, `death`, `kill`, `damaged`, `enter`, `shiftedInto`, `parried`…), passives and Power Up effects are all written as data, and the engine interprets them. To add a card, add an object to a set file.
 
-Everything about a card is data in `public/js/cards.js`. The schema is documented at the top of that file. The card text you see in the game is generated from that data, and the engine and bots read the same fields, so you never write rules text by hand. Example:
+### Card art
 
-```js
-{ id: 'iron_legionnaire', name: 'Iron Legionnaire', type: 'fighter', energy: ['M'], hp: 7, art: '🛡️',
-  keywords: ['Parry'],
-  attacks: [
-    { name: 'Gladius Thrust', cost: ['M'], damage: 2 },
-    { name: 'Shield Bash', cost: ['M', 'T'], damage: 3, keywords: ['Counterattack'] },
-  ] },
-```
+Every card has an illustration in `public/art/<id>.svg`, made by `node tools/gen-art.js`. They are procedural: each faction has its own scene style, and each card gets a seeded composition built around its creature or emblem. They are not hand-painted or AI-generated, because there is no image model in this environment. To use your own art, drop a PNG or SVG at `public/art/<id>.svg` (or change the path in `render.js`). The emoji only appears if an image is missing.
 
-Power Ups use a small set of effect types (tokens, cleanse, heal, draw, attach, retreat, favour, recall, tap a support card, reinforce). To add a new kind of effect, add a case to `resolvePowerUp` in `engine.js`.
+## Changes I made to the deck concepts
+
+You said the concepts weren't perfect and that I could change things, so here is everything I changed and why.
+
+**Scale.** Your concepts use HP 9–44 and damage 4–20, which is about twice the scale of my original placeholder cards. I doubled the placeholder cards' HP and damage to match, so all decks can play each other.
+
+**New rules that the concepts needed**
+- **Binding / Bound** is a new status. A Bound unit can't Retreat, move zones or react, and its attacks deal 2 less damage. It is removed like other statuses (4+ when the unit attacks).
+- **Faction tokens** (Evidence, Pressure, Void) are *counters, not energy*. When Pressure and Void could be spent as energy, Apex and The Hollowing got so much free energy that they won almost every game.
+- **Shifted forms** (any version that says "Shift onto … only") can only enter the Arena by Shifting. Without this rule the bots played Sovereign Stage 4 straight from hand on turn 8. You can still play them as energy and Shift them from the Support Zone, which the rulebook already allows.
+- Unit keywords written on attack lines in the docs (for example "Parry" or "Embolden" next to an attack) are treated as keywords of the unit.
+- Abilities that cost "0" and generate tokens every turn mostly cost 1 energy now. Free tokens every turn made games stall.
+
+**Per deck**
+- **Elementals:** every unit has Resonance, which is the shared elemental pool. Resonant Surge, whose "tokens count double" was hard to track, now doubles the tokens on one unit (up to +4). Updraft moves a Ready unit into the Active Zone, because moving there is already free.
+- **Threshold Bureau:** "on your next fighter to enter" effects place the tokens on Mara herself. Psychic Scent asks you for the source and the destination.
+- **Apex Syndicate:**
+  - Sovereign's stages have 18/22/26/30/34 HP. Containment Aura needs an Active *fighter* beside him, so pairing him with a character for Favour costs him his protection.
+  - Damage redirection (Take the Hit, Bulwark Stance, Absorb Blow) is a "guard" effect, and Designated Target is a taunt.
+  - Vantage, Null and Phalanx are flip cards with a second form, because the docs didn't list separate cards for those forms.
+- **Octo-Autons:**
+  - **Renamed** Kwazii, Peso and Tweak to Corsair Shadowpaw, Medic Deepfin and Tinker Boltwhisker, and "GUP" to "Pod". Those are Octonauts names, and your doc asks for original IP.
+  - **Loyal Crew** was redundant: moving Ready units into the Active Zone is already free in Resolving. Now when a crew character Shifts, a Loyal Crew fighter can come out of your Support Zone into the Ready Zone.
+  - **HP** is raised to 11–24. At the original HP of 4–12, units died to almost any single hit.
+- **Hollowing:**
+  - **Void tokens** come from every 3 damage taken and every 4 dealt.
+  - **Second Grimstone:** I added a second copy to make 40 cards, as your doc suggested.
+  - **The Absence** loses 1 Void token per turn, so it can't stay untargetable forever.
+  - **Accelerated Hollowing** is capped at +4 tokens.
+
+**Balance.** In 12 games per pairing (Hard bot on both sides), the concept decks win 30–78% of their games:
+
+| Deck | Win % |
+|---|---|
+| Elementals | 78% |
+| Apex Syndicate | 75% |
+| Threshold Bureau | 69% |
+| Octo-Autons | 32% |
+| Hollowing | 30% |
+
+The bot handles effect-heavy decks (Octo-Autons, Hollowing) less skilfully than a person would, so treat these numbers as a starting point for human playtesting. `node tests/balance.js` reruns the report.
 
 ## How I interpreted unclear rules
 
@@ -83,7 +136,7 @@ npm test                 # or: node --test tests/rules.test.js
 npm run simulate         # or: node tests/simulate.js 100
 ```
 
-### What the bot-vs-bot simulation shows (useful for playtesting)
+### What the bot-vs-bot simulation shows (starter decks only) (useful for playtesting)
 
 These numbers are from 100 games per matchup with the preset decks:
 
