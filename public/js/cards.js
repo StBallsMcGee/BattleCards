@@ -62,6 +62,8 @@
  *                 { do: 'destroy', to } · { do: 'recall' } · { do: 'fromSupport', activeIf } · { do: 'toReady' }
  *                 { do: 'toActive', to } · { do: 'hpBonus', n, to } · { do: 'flag', flag, who, dur } · { do: 'counter', name }
  *                 any effect may carry `if: <condition>`; tokens/draw may carry nIf: { cond, n }
+ *                 { do: 'tutor', find, n, prompt } — search the deck; find: { type, keyword, base, ids, unit,
+ *                   shiftOnly (true/false), shiftsOntoArena, nextStage } (all must hold)
  * Targets (to):   self · target · attacker · sovereign · allFriendly · otherFriendly · otherFriendlyActive ·
  *                 friendlyCharsActive · allEnemies · enemyActive · otherEnemyActive · allUnits · randomEnemy ·
  *                 randomEnemyActive · randomOtherFriendly · pickFriendly · pickOtherFriendly · pickEnemy ·
@@ -69,7 +71,7 @@
  * Conditions:     { k: 'favour'|'oppFavour'|'targetDamage'|'targetTokens'|'selfTokens'|'hitTokens'|'arenaTokens'|
  *                 'selfKills'|'voidGained'|'hpAtMost'|'counter'|'spent'|'pressure'|'enemyKills'|'allyDeaths'|'stage'|
  *                 'twoCharsActive'|'charActive'|'friendlyOtherActive'|'friendlyFighterActive'|'inArena'|'bothAttacked'|
- *                 'killed'|'isReaction'|'targetIsCharacter'|'targetStatus', … } · { k: 'any'|'all', of: [...] } · [a, b] = all
+ *                 'killed'|'isReaction'|'targetIsCharacter'|'targetStatus'|'deckHas' { find }, … } · { k: 'any'|'all', of: [...] } · [a, b] = all
  * Marks:          untargetable · taunt · noReact · guard { protect: 'sovereign'|'others' } · undying · weakened ·
  *                 noAttack · bonusDie { n } · plusDamage { n } · unparryable · grantParry · interveneAny ·
  *                 freeAttack · canShiftNow · ignoreShiftCond · shiftOnKill · regen { n }
@@ -362,6 +364,13 @@
       effect: { type: 'cleanse' }, flavor: 'Tastes awful. Works wonders.' },
     { id: 'field_dressing', name: 'Field Dressing', type: 'powerup', art: '🩹', target: 'ownUnit',
       effect: { type: 'heal', n: 6 }, flavor: 'Walk it off.' },
+    { id: 'scouting_report', name: 'Scouting Report', type: 'powerup', art: '🔭', target: 'none',
+      effects: [{ do: 'draw', n: 1, nIf: { cond: { k: 'charActive' }, n: 3 } }],
+      text: 'Draw 1 card. If you have a character in your Active Zone, draw 3 instead.', flavor: 'Know the pit before you bleed in it.' },
+    { id: 'call_to_arms', name: 'Call to Arms', type: 'powerup', art: '📯', target: 'none',
+      requires: { k: 'deckHas', find: { type: 'character', shiftsOntoArena: true } }, requiresText: 'You need a character in your Arena with another version in your deck.',
+      effects: [{ do: 'tutor', find: { type: 'character', shiftsOntoArena: true }, prompt: 'Call to Arms: take which version?' }],
+      text: 'Search your deck for another version of a character in your Arena, reveal it and put it into your hand. Shuffle your deck.', flavor: 'The crowd chants a name. Someone answers.' },
     { id: 'second_wind', name: 'Second Wind', type: 'powerup', art: '🌬️', target: 'none',
       effect: { type: 'draw', n: 2 }, flavor: 'Not done yet.' },
     { id: 'war_banner', name: 'War Banner', type: 'powerup', art: '🚩', target: 'ownUnit',
@@ -548,7 +557,7 @@
         ['honour_guard', 2], ['veteran_pikeman', 2], ['field_commander', 2], ['crossbow_marksman', 2], ['ambush_scout', 2],
         ['smoke_saboteur', 2], ['legion_tactician', 2], ['war_drummer', 2],
         ['valeria_pit', 1], ['valeria_champion', 1], ['hale_junior', 1], ['hale_chief', 1],
-        ['whetstone', 2], ['battle_plan', 2], ['war_banner', 2], ['smoke_bomb', 1], ['crowd_pleaser', 1], ['second_wind', 2],
+        ['whetstone', 2], ['battle_plan', 2], ['war_banner', 1], ['smoke_bomb', 1], ['crowd_pleaser', 1], ['second_wind', 1], ['scouting_report', 1], ['call_to_arms', 1],
       ]),
     },
     {
@@ -559,7 +568,7 @@
         ['runic_sentinel', 2], ['spirit_wisp', 2], ['clockwork_sentry', 2], ['plasma_trooper', 2], ['nanite_swarm', 2],
         ['drone_medic', 2], ['tesla_engineer', 2], ['sniper_drone', 2],
         ['orrin_hedge', 1], ['orrin_archmage', 1], ['k7_salvage', 1], ['k7_warframe', 1],
-        ['arcane_focus', 2], ['overclock', 2], ['antidote', 2], ['field_dressing', 2], ['sabotage', 2],
+        ['arcane_focus', 2], ['overclock', 2], ['antidote', 1], ['field_dressing', 1], ['sabotage', 2], ['scouting_report', 1], ['call_to_arms', 1],
       ]),
     },
     {
@@ -570,7 +579,7 @@
         ['scrap_golem', 2], ['mech_walker', 2], ['plasma_trooper', 2], ['runic_sentinel', 2], ['tesla_engineer', 2],
         ['wyrmling', 2], ['gladiator_recruit', 2],
         ['grimbold_warden', 1], ['grimbold_unsealed', 1], ['k7_salvage', 1], ['k7_warframe', 1], ['valeria_pit', 1], ['valeria_champion', 1],
-        ['whetstone', 2], ['overclock', 2], ['tower_shield', 2], ['recall', 2], ['reinforcements', 2],
+        ['whetstone', 2], ['overclock', 2], ['tower_shield', 1], ['recall', 2], ['reinforcements', 1], ['scouting_report', 1], ['call_to_arms', 1],
       ]),
     },
     {
@@ -581,7 +590,7 @@
         ['nanite_swarm', 2], ['legion_tactician', 2], ['crossbow_marksman', 2], ['field_commander', 2], ['mirror_sprite', 2],
         ['hex_weaver', 2], ['tesla_engineer', 2], ['plasma_trooper', 2],
         ['hale_junior', 1], ['hale_chief', 1], ['orrin_hedge', 1], ['orrin_archmage', 1],
-        ['battle_plan', 2], ['overclock', 2], ['sabotage', 2], ['smoke_bomb', 2], ['second_wind', 2],
+        ['battle_plan', 2], ['overclock', 2], ['sabotage', 2], ['smoke_bomb', 1], ['second_wind', 1], ['scouting_report', 1], ['call_to_arms', 1],
       ]),
     },
   ];

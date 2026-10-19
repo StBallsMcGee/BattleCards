@@ -751,7 +751,7 @@
     const list = (UI.favourLog || [[], []])[p];
     modal('<h3>' + esc(P.name) + ' — Favour ' + P.favour + '/10</h3><div class="fav-history">' +
       (list.length ? list.map(f => '<div>Turn ' + f.turn + ': <b>+' + f.n + '</b> — ' + esc(f.reason) + '</div>').join('') : '<p class="muted">No Favour gained yet.</p>') +
-      '</div><p class="muted" style="max-width:420px">Favour comes from: 5+ excess damage to a character · your character killing a character · defeating both enemy Active units in one turn · two characters in your Active Zone at the end of your turn · your Honourable unit dying · a Brutal attack defeating a unit · some card effects.</p>');
+      '</div><p class="muted" style="max-width:420px">Favour comes from: overkilling any enemy unit by 5+ · your character killing a character · defeating both enemy Active units in one turn · two characters in your Active Zone at the end of your turn · your Honourable unit dying · a Brutal attack defeating a unit · some card effects.</p>');
   }
 
   function openGameMenu() {
@@ -805,6 +805,12 @@
       }
       case 'tokens': return tokenPrompt(view, c, unitName);
       case 'pick': {
+        if (c.options.length && c.options[0].card) { // searching your deck
+          const p = showPrompt('<h3>' + esc(c.prompt || 'Search your deck') + '</h3><p>Click a card to put it into your hand.</p><div class="discard-grid">' +
+            c.options.map(o => '<div class="dpick" data-u="' + o.uid + '" title="' + esc(o.label) + '">' + R.compact(o.card, { w: 80 }) + '</div>').join('') + '</div>', 'wide');
+          $$('[data-u]', p).forEach(x => x.onclick = () => send({ uid: x.dataset.u }));
+          return;
+        }
         const p = showPrompt('<h3>' + esc(c.prompt || 'Choose a unit') + '</h3><div class="pick-grid">' +
           c.options.map(o => '<button class="btn" data-u="' + o.uid + '">' + esc(o.label) + '</button>').join('') +
           (c.optional ? '<button class="btn subtle" data-u="">No thanks</button>' : '') + '</div>', 'urgent');

@@ -89,11 +89,19 @@
     { id: 'oa_descent', name: 'Deep Descent Booster', type: 'powerup', art: '🚀', target: 'ownReadyUnit',
       effects: [{ do: 'toActive' }, { do: 'mark', mark: 'bonusDie', dur: 'turn', to: 'target', data: { n: 1 } }],
       text: 'Move one of your Ready units into an empty Active slot. Its attacks gain +1d6 this turn.' },
+    { id: 'oa_sonar_sweep', name: 'Deep Sonar Sweep', type: 'powerup', art: '📡', target: 'none',
+      requires: { k: 'deckHas', find: { shiftOnly: true, shiftsOntoArena: true } }, requiresText: 'You need a crew character in your Arena whose Nightmare form is still in your deck.',
+      effects: [{ do: 'tutor', find: { shiftOnly: true, shiftsOntoArena: true }, prompt: 'Sonar Sweep: what answers from the deep?' }],
+      text: 'Search your deck for the Nightmare form of a crew character in your Arena and put it into your hand.', flavor: 'Ping. Ping. Ping. Something pinged back.' },
+    { id: 'oa_supply_drop', name: 'Supply Drop', type: 'powerup', art: '📦', target: 'none',
+      requires: { k: 'deckHas', find: { type: 'fighter', keyword: 'Loyal Crew' } }, requiresText: 'No Loyal Crew fighters left in your deck.',
+      effects: [{ do: 'tutor', find: { type: 'fighter', keyword: 'Loyal Crew' }, prompt: 'Supply Drop: who rides down with it?' }, { do: 'draw', n: 1 }],
+      text: 'Search your deck for a Loyal Crew fighter and put it into your hand. Draw 1 card.', flavor: 'Crates, rations, and one very seasick engineer.' },
   ];
   const deck = [
     ['oa_abyssclaw', 1], ['oa_abyssclaw_n', 1], ['oa_shadowpaw', 1], ['oa_shadowpaw_n', 1], ['oa_deepfin', 1], ['oa_deepfin_n', 1], ['oa_boltwhisker', 1], ['oa_boltwhisker_n', 1],
     ['oa_probe', 2], ['oa_hull', 2], ['oa_sonar', 2], ['oa_depth_charge', 2], ['oa_jellyfish', 2], ['oa_claw', 2], ['oa_pod', 2], ['oa_echo', 2],
-    ['oa_overclock', 2], ['oa_recall', 2], ['oa_night_vision', 2], ['oa_injector', 2], ['oa_hull_patch', 2], ['oa_jump_scare', 2], ['oa_twin_link', 2], ['oa_descent', 2],
+    ['oa_overclock', 2], ['oa_recall', 2], ['oa_night_vision', 2], ['oa_injector', 2], ['oa_hull_patch', 1], ['oa_jump_scare', 1], ['oa_twin_link', 1], ['oa_sonar_sweep', 2], ['oa_supply_drop', 1], ['oa_descent', 2],
   ];
   return { id: 'octo', faction: 'Octo-Autons', cards, deck,
     info: { id: 'octo', name: 'Abyssal Octo-Autons', colors: ['S', 'M'],

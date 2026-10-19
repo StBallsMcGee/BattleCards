@@ -55,7 +55,7 @@
 <li>Damage and tokens carry over; statuses are removed; the stack goes to the Graveyard together.</li></ul>
 
 <h3>9. Favour</h3>
-<table><tr><td>One attack deals 5+ excess damage to an opposing character</td><th>+1</th></tr>
+<table><tr><td>Overkill: one attack deals 5+ more damage than an opposing unit had HP left</td><th>+1</th></tr>
 <tr><td>One of your characters kills an opposing character</td><th>+1</th></tr>
 <tr><td>Both of your opponent's Active units are Defeated in the same turn</td><th>+1</th></tr>
 <tr><td>Two characters in your Active Zone during your Resolving phase</td><th>+1</th></tr>
@@ -77,6 +77,7 @@ ${kw(['Resonance', 'Evidence', 'Pressure', 'Voidborn', 'Void', 'Loyal Crew'])}
 <ul>
 <li><b>Shifted forms</b> — a character version that says "Shift onto … only" can only enter the Arena by Shifting. You can still play it as energy and Shift it from your Support Zone later.</li>
 <li><b>Flip cards</b> (Vantage, Null, Phalanx) turn into their second form in your Resolving phase once the listed condition is met.</li>
+<li><b>Search your deck</b> — pick a matching card, reveal it and put it into your hand, then shuffle. A search Power Up can only be played if your deck holds a card it can find.</li>
 <li><b>Effect damage</b> from triggers and Power Ups is not an attack: it can't be Parried or negated with tokens and never triggers reactions.</li>
 <li><b>Area attacks</b> ("all") hit every opposing Active unit; only the main target can react.</li>
 <li>Temporary effects shown as icons on units: 🫥 untargetable · 🎯 must be targeted · 🧱 guarding · ♾️ cannot be killed · ½ deals half damage · ⛔ cannot attack · 🔇 cannot react · 🎲 bonus die.</li>

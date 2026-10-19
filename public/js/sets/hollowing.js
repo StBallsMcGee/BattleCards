@@ -144,13 +144,21 @@
     { id: 'ho_collapse', name: 'Geometric Collapse', type: 'powerup', art: '🔺', target: 'oppCharacter',
       effects: [{ do: 'mark', mark: 'noAttack', dur: 'next', to: 'target' }, { do: 'removeTokens', token: 'all', to: 'target' }, V(2, 'pickFriendly')],
       text: 'An opposing character cannot attack during its next turn and loses all its tokens. Place 2 Void tokens on one of your units.', flavor: 'The angles stopped adding up. It noticed.' },
+    { id: 'ho_specimen_log', name: 'Specimen Log', type: 'powerup', art: '🧫', target: 'none',
+      requires: { k: 'deckHas', find: { shiftOnly: true, shiftsOntoArena: true } }, requiresText: 'You need a unit in your Arena whose Shifted form is still in your deck.',
+      effects: [{ do: 'tutor', find: { shiftOnly: true, shiftsOntoArena: true }, prompt: 'Specimen Log: what is it becoming?' }],
+      text: 'Search your deck for the Shifted form of a unit in your Arena and put it into your hand.', flavor: 'Entry 41: the specimen has outgrown its jar. And its name.' },
+    { id: 'ho_catalogue', name: 'Catalogue the Hollow', type: 'powerup', art: '🏷️', target: 'none',
+      requires: { k: 'deckHas', find: { keyword: 'Voidborn', shiftOnly: false } }, requiresText: 'No unshifted Voidborn units left in your deck.',
+      effects: [{ do: 'tutor', find: { keyword: 'Voidborn', shiftOnly: false }, prompt: 'Catalogue the Hollow: which specimen?' }, { do: 'tokens', token: 'V', n: 1, to: 'pickFriendly' }],
+      text: 'Search your deck for a Voidborn unit that is not a Shifted form and put it into your hand. Place 1 Void token on one of your units.', flavor: 'Name it, number it, never turn your back on it.' },
   ];
   const deck = [
     ['ho_crane', 1], ['ho_crane_exposed', 1], ['ho_crane_hollow', 1],
     ['ho_murkling', 1], ['ho_murkling_c', 1], ['ho_thornpelt', 1], ['ho_thornpelt_c', 1], ['ho_ashwing', 1], ['ho_ashwing_c', 1],
     ['ho_grimstone', 2], ['ho_grimstone_c', 1], ['ho_crawler', 1], ['ho_crawler_c', 1], ['ho_smog', 1], ['ho_smog_c', 1],
     ['ho_hound', 1], ['ho_hound_c', 1], ['ho_moth', 1], ['ho_moth_c', 1], ['ho_rotcap', 1], ['ho_rotcap_c', 1], ['ho_gloaming', 1], ['ho_gloaming_c', 1],
-    ['ho_exposure', 2], ['ho_contaminate', 2], ['ho_accelerated', 2], ['ho_wrong_shape', 2], ['ho_drain', 2], ['ho_field_notes', 2], ['ho_rift_scar', 2], ['ho_collapse', 2],
+    ['ho_exposure', 2], ['ho_contaminate', 2], ['ho_accelerated', 2], ['ho_wrong_shape', 1], ['ho_drain', 2], ['ho_field_notes', 2], ['ho_rift_scar', 1], ['ho_collapse', 1], ['ho_specimen_log', 2], ['ho_catalogue', 1],
   ];
   return { id: 'hollowing', faction: 'The Hollowing', cards, deck,
     info: { id: 'hollowing', name: 'The Hollowing', colors: ['A', 'M'],

@@ -137,7 +137,7 @@
       text: '<div class="coach-do">Click <b>Resolve attacks ▶</b>.</div>',
       hl: () => [$('#main-btn')], allow: a => a.type === 'endPhase' || a.type === 'resolve', deny: 'Resolve your attack.' },
     { title: 'The crowd roars!', when: v => v.turn === 5 && v.players[0].favour >= 1 && UI.isIdle(), next: true, pos: 'right',
-      text: '<p>+1 Favour! Other ways to win the crowd: deal <b>5+ excess damage</b> to a character, have one of your characters <b>kill a character</b>, defeat <b>both</b> enemy Active units in one turn, have <b>two characters Active</b> in your Resolving phase, or lose an <b>Honourable</b> unit.</p>' },
+      text: '<p>+1 Favour! Other ways to win the crowd: <b>overkill</b> any enemy unit by 5+ damage, have one of your characters <b>kill a character</b>, defeat <b>both</b> enemy Active units in one turn, have <b>two characters Active</b> in your Resolving phase, or lose an <b>Honourable</b> unit.</p>' },
     { title: 'Your turn to shine', next: true, pos: 'right', last: true,
       text: '<p>You know the basics! A few more things to discover as you finish this match:</p><ul style="margin:0 0 8px;padding-left:18px">' +
         '<li><b>Retreat</b> a hurt Active unit to Ready (2 energy).</li><li><b>Shift</b>: you hold Valeria, Pit Fighter and her Champion version — in your Resolving phase she can transform.</li>' +

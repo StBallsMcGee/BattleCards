@@ -17,7 +17,7 @@ Open the address in a browser and choose **Play Online → Create Room**. Your o
 
 ## Features
 
-- **Five deck sets from your concept doc** plus four starter decks: 183 cards in total, each with a generated illustration.
+- **Five deck sets from your concept doc** plus four starter decks: 194 cards in total, each with a generated illustration.
 - **Rules engine** (`public/js/engine.js`). It implements every section of the rulebook: setup with simultaneous face-down placement and mulligans, the Arming, Fighting and Resolving phases, energy with tapping and dual types, energy tokens, all attack, reaction, unit and token keywords, the four statuses, Shift, Veteran, all six Favour sources, the three win conditions, draws, and the 7-card hand limit. Each decision either player has to make pauses the engine until that player answers, including decisions during the opponent's turn: spending tokens to negate damage, counterattacking or intervening, triggering a Veteran.
 - **Game board** in the style of Hearthstone and MTG Arena. You can drag cards from your hand onto zones, or click a card for its action menu. It draws attack arrows, rolls animated dice, shows floating damage numbers and banners, and animates cards between zones. Hover any card for a large preview with explanations of its keywords and statuses. The board also shows a phase tracker, a per-turn limit tracker, a game log, a graveyard viewer and synthesized sound effects.
 - **Tutorial**: a scripted 25-step lesson against Instructor Brutus. It covers setup, energy, Ready plays, Power Ups and tokens, declaring and resolving attacks, Defeat, Poison, dual energy, Parry, Counterattack, Brutal and Favour, then continues as free play.
@@ -42,7 +42,7 @@ public/js/render.js    card faces
 public/js/tutorial.js  tutorial script
 public/js/controllers.js  local (bot) and remote (server) game controllers
 public/js/deckbuilder.js, main.js, rules.js, sound.js
-tests/rules.test.js    30 rule-scenario tests
+tests/rules.test.js    32 rule-scenario tests
 tests/balance.js       deck-vs-deck balance report
 tools/gen-art.js       generates the card illustrations
 public/js/sets/        the five concept-doc deck sets
@@ -103,17 +103,42 @@ You said the concepts weren't perfect and that I could change things, so here is
   - **The Absence** loses 1 Void token per turn, so it can't stay untargetable forever.
   - **Accelerated Hollowing** is capped at +4 tokens.
 
-**Balance.** In 12 games per pairing (Hard bot on both sides), the concept decks win 30–78% of their games:
+**Balance.** In 12 games per pairing (Hard bot on both sides, with the overkill rule and the search cards), the concept decks win 38–84% of their games:
 
 | Deck | Win % |
 |---|---|
-| Elementals | 78% |
-| Apex Syndicate | 75% |
-| Threshold Bureau | 69% |
-| Octo-Autons | 32% |
-| Hollowing | 30% |
+| Apex Syndicate | 84% |
+| Threshold Bureau | 65% |
+| Elementals | 61% |
+| Hollowing | 56% |
+| Octo-Autons | 38% |
+
+Apex gained the most from the overkill rule, because Sovereign's later Stages hit far harder than anything else.
 
 The bot handles effect-heavy decks (Octo-Autons, Hollowing) less skilfully than a person would, so treat these numbers as a starting point for human playtesting. `node tests/balance.js` reruns the report.
+
+## Overkill and deck searching
+
+**Overkill rule.** Any attack that deals 5 or more damage beyond what an opposing unit (fighter *or* character) had left gains 1 Favour. This replaces the rulebook's "5+ excess damage to a character". It applies per unit hit, so a splash or area attack can overkill more than one. More games now end on 10 Favour.
+
+**Draw and tutor Power Ups.** Every deck now has a way to find the cards it depends on. "Search your deck" puts the chosen card into your hand, reveals it and shuffles your deck. A search card can only be played when your deck holds a card it can find.
+
+| Card | Set | Effect |
+|---|---|---|
+| Call to Arms | starter | Search for another version of a character in your Arena |
+| Scouting Report | starter | Draw 1, or 3 if you have a character Active |
+| Rift Beacon | Elementals | Search for the Shifted form of an Elemental in your Arena; +1 Science token |
+| Portal Scrying | Elementals | Search for an unshifted Elemental character |
+| Open Case File | Threshold Bureau | Search for a detective's Threshold form; +1 Evidence |
+| Interrogation | Threshold Bureau | Draw 2, or 3 with 3+ Evidence in the Arena |
+| Press Conference | Apex Syndicate | Search for Sovereign's *next* Stage; +1 Pressure |
+| Contingency Plan | Apex Syndicate | Draw 2, or 3 at Stage 3+ (deck builder only; not in the preset) |
+| Deep Sonar Sweep | Octo-Autons | Search for a crew character's Nightmare form (2 in the preset) |
+| Supply Drop | Octo-Autons | Search for a Loyal Crew fighter, then draw 1 |
+| Specimen Log | Hollowing | Search for the Shifted form of a unit in your Arena (2 in the preset) |
+| Catalogue the Hollow | Hollowing | Search for an unshifted Voidborn unit; +1 Void |
+
+To keep the presets at 40 cards, each one dropped a copy of some of its other Power Ups.
 
 ## How I interpreted unclear rules
 

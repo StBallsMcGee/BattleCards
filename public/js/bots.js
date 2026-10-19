@@ -132,7 +132,8 @@
         case 'tokens': s += e.token === 'P' ? 1.5 * e.n : (e.n === 'double' ? (u ? Math.min(4, E.TOKEN_KINDS.reduce((a, k) => a + u.tokens[k], 0)) : 0) : (e.n || 1)) * (enemy ? -0.5 : 1); break;
         case 'damage': s += e.to === 'allUnits' ? (E.arenaUnits(O).length - E.arenaUnits(P).length) * e.n * 0.6 : e.n; break;
         case 'removeTokens': s += u ? (e.damagePer || 1) * Math.max(0, E.TOKEN_KINDS.reduce((a, k) => a + (e.token === 'all' || e.token === k ? u.tokens[k] : 0), 0)) : 0; break;
-        case 'draw': s += P.hand.length <= 4 && P.deckCount > 8 ? 2 * e.n : 0; break;
+        case 'draw': s += P.hand.length <= 4 && P.deckCount > 8 ? 2 * Math.max(e.n, e.nIf ? e.nIf.n : 0) : 0; break;
+        case 'tutor': s += P.deckCount > 4 ? (e.find && (e.find.shiftsOntoArena || e.find.nextStage) ? 6 : 3.5) : 0; break;
         case 'favour': s += 6; break;
         case 'heal': s += u ? Math.min(e.n === 'd6' ? 3.5 : e.n, u.damage) : 0; break;
         case 'recall': s += 4; break;
@@ -350,7 +351,7 @@
       if (E.isCharacter(u) && E.isCharacter(t)) s += 4;
       if (def(t).keywords.includes('Honourable')) s -= 2;
     }
-    if (E.isCharacter(t) && exp - left >= 5) s += 4;
+    if (exp - left >= 5) s += 4;
     for (const k of atk.keywords) {
       const st = E.STATUS_KEYWORDS[k];
       if (st && !t.statuses.includes(st) && !kills) s += statusValue(st) * 0.5;
@@ -535,6 +536,11 @@
   function pickUnit(level, view, c) {
     if (level === 'easy' || !c.options.length) return { uid: c.options.length ? pick(c.options).uid : null };
     const me = view.me;
+    if (c.options[0].card) { // searching the deck: take the biggest card, preferring Shifts onto units already in play
+      const mine = E.arenaUnits(view.players[me]).map(u => E.baseName(u));
+      const val = o => { const d = Cards.byId[o.card]; return (mine.includes(d.baseName || d.name) ? 20 : 0) + (d.stage || 0) * 3 + (d.hp || 0) / 4; };
+      return { uid: c.options.slice().sort((a, b) => val(b) - val(a))[0].uid };
+    }
     const units = c.options.map(o => ({ o, u: E.unitByUid(view, o.uid) }));
     const heal = /heal/i.test(c.prompt || '');
     const score = ({ u, o }) => {

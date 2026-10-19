@@ -146,12 +146,19 @@
       requires: { k: 'inArena', base: 'Sovereign' }, requiresText: 'Sovereign must be in your Arena.',
       effects: [{ do: 'mark', mark: 'undying', dur: 'next', to: 'sovereign' }, { do: 'mark', mark: 'regen', dur: 'next2', to: 'sovereign', data: { n: 6 }, if: { k: 'stage', min: 4 } }],
       text: 'Until your next turn, Sovereign cannot be killed (he stays at 1 HP). At Stage 4+, he also regenerates 6 damage at the start of your next turn.', flavor: 'There was no one left with the authority to stop him.' },
+    { id: 'ax_press_conference', name: 'Press Conference', type: 'powerup', art: '🎙️', target: 'none',
+      requires: { k: 'deckHas', find: { base: 'Sovereign', nextStage: true } }, requiresText: "Sovereign's next Stage is not in your deck.",
+      effects: [{ do: 'tutor', find: { base: 'Sovereign', nextStage: true }, prompt: 'Press Conference: next Stage' }, P(1)],
+      text: "Search your deck for Sovereign's next Stage and put it into your hand. Place 1 Pressure token on Sovereign.", flavor: 'He announced his ascension before it happened. It happened.' },
+    { id: 'ax_contingency', name: 'Contingency Plan', type: 'powerup', art: '📋', target: 'none',
+      effects: [{ do: 'draw', n: 2, nIf: { cond: { k: 'stage', min: 3 }, n: 3 } }],
+      text: 'Draw 2 cards. If Sovereign is at Stage 3+, draw 3 instead.', flavor: 'There is always a plan for when the plan fails.' },
   ];
   const deck = [
     ['ax_sov1', 1], ['ax_sov2', 1], ['ax_sov3', 1], ['ax_sov4', 1], ['ax_sov5', 1], ['ax_vantage', 1], ['ax_null', 1], ['ax_phalanx', 1],
     ['ax_pr_handler', 2], ['ax_enforcer', 2], ['ax_brute', 2], ['ax_sniper', 2], ['ax_asset', 2], ['ax_drone', 2],
     ['ax_loyalist', 2], ['ax_wetwork', 2], ['ax_tether', 2], ['ax_response', 2], ['ax_media', 2], ['ax_survivor', 2],
-    ['ax_sanctioned', 2], ['ax_pr_burial', 2], ['ax_sacrifice', 2], ['ax_above_law', 2],
+    ['ax_sanctioned', 2], ['ax_pr_burial', 2], ['ax_sacrifice', 1], ['ax_press_conference', 1], ['ax_above_law', 2],
   ];
   return { id: 'apex', faction: 'Apex Syndicate', cards, deck,
     info: { id: 'apex', name: 'The Apex Syndicate', colors: ['M', 'A'],

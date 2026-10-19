@@ -101,12 +101,20 @@
       requires: { k: 'twoCharsActive' }, requiresText: 'You need two characters in your Active Zone.',
       effects: [{ do: 'mark', mark: 'freeAttack', dur: 'turn', to: 'friendlyCharsActive' }],
       text: 'If you have two characters in your Active Zone, both may attack this turn without spending energy.', flavor: 'When the elements agree, nothing stands.' },
+    { id: 'el_rift_beacon', name: 'Rift Beacon', type: 'powerup', art: '🗼', target: 'none',
+      requires: { k: 'deckHas', find: { shiftOnly: true, shiftsOntoArena: true } }, requiresText: 'You need an Elemental in your Arena whose Shifted form is still in your deck.',
+      effects: [{ do: 'tutor', find: { shiftOnly: true, shiftsOntoArena: true }, prompt: 'Rift Beacon: call which Ascended form?' }, { do: 'tokens', token: 'S', n: 1, to: 'pickFriendly' }],
+      text: 'Search your deck for the Shifted form of an Elemental in your Arena and put it into your hand. Then place 1 Science token on one of your units.', flavor: 'Light the beacon and the rift answers in kind.' },
+    { id: 'el_portal_scrying', name: 'Portal Scrying', type: 'powerup', art: '🔮', target: 'none',
+      requires: { k: 'deckHas', find: { type: 'character', shiftOnly: false } }, requiresText: 'No Elemental characters left in your deck.',
+      effects: [{ do: 'tutor', find: { type: 'character', shiftOnly: false }, prompt: 'Portal Scrying: summon which Elemental?' }],
+      text: 'Search your deck for an Elemental character that is not a Shifted form and put it into your hand.', flavor: 'Every portal shows a face, if you look long enough.' },
   ];
   const deck = [
     ['el_cinder', 1], ['el_cinder_avatar', 1], ['el_torque', 1], ['el_torque_fortress', 1], ['el_zephyra', 1], ['el_zephyra_storm', 1], ['el_volt', 1], ['el_volt_overloaded', 1],
     ['el_slagback', 2], ['el_prism_archer', 2], ['el_riftwarden', 2], ['el_golem', 2], ['el_emberstep', 2], ['el_stormcaller', 2],
     ['el_ironclad', 2], ['el_neonblade', 2], ['el_magmakin', 2], ['el_monk', 2], ['el_glacial', 2], ['el_specter', 2],
-    ['el_prismatic', 2], ['el_resonant_surge', 2], ['el_portal_recall', 2], ['el_harmony', 2],
+    ['el_prismatic', 2], ['el_resonant_surge', 1], ['el_portal_recall', 1], ['el_rift_beacon', 1], ['el_portal_scrying', 1], ['el_harmony', 2],
   ];
   return { id: 'elementals', faction: 'The Elementals', cards, deck,
     info: { id: 'elementals', name: 'The Elementals', colors: ['A', 'T'],

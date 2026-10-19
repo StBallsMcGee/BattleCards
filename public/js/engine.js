@@ -414,8 +414,25 @@
       case 'isReaction': return !!ctx.isReaction;
       case 'targetIsCharacter': return !!ctx.target && !!ctx.target.id && isCharacter(ctx.target);
       case 'targetStatus': return !!ctx.target && c.statuses.some(s => ctx.target.statuses.includes(s));
+      case 'deckHas': return (P.deck.length || !P.deckList ? P.deck : P.deckList.map(id => ({ id }))).some(x => tutorMatch(state, ctx.p, x, c.find));
     }
     return false;
+  }
+
+  /** Does a deck card match a tutor filter? find: { type, keyword, base, ids, shiftsOntoArena, nextStage } (all optional, all must hold). */
+  function tutorMatch(state, p, card, f) {
+    const d = Cards.byId[card.id], P = state.players[p];
+    if (!d || !f) return !!d && !!f;
+    const base = d.baseName || d.name;
+    if (f.type && d.type !== f.type) return false;
+    if (f.unit && d.type === 'powerup') return false;
+    if (f.keyword && !(d.keywords || []).includes(f.keyword)) return false;
+    if (f.base && base !== f.base) return false;
+    if (f.ids && !f.ids.includes(d.id)) return false;
+    if (f.shiftOnly != null && f.shiftOnly !== !!(d.shift && d.shift.ontoOnly)) return false;
+    if (f.shiftsOntoArena && !arenaUnits(P).some(u => !u.defeated && baseName(u) === base && u.id !== d.id)) return false;
+    if (f.nextStage && d.stage !== stageOf(state, p) + 1) return false;
+    return true;
   }
 
   // ───────────────────────── winning & Favour ─────────────────────────
@@ -755,6 +772,21 @@
       }
       case 'draw': drawCards(state, ctx.p, e.nIf && cond(state, e.nIf.cond, ctx) ? e.nIf.n : e.n); return;
       case 'favour': yield* gain(state, ctx.p, e.reason || (src ? cname(src) : 'card effect'), e.n || 1); return;
+      case 'tutor': {
+        for (let k = 0; k < (e.n || 1); k++) {
+          const pool = P.deck.filter(x => tutorMatch(state, ctx.p, x, e.find));
+          if (!pool.length) { log(state, pname(state, ctx.p) + ' searches their deck but finds nothing that fits.'); break; }
+          const seen = {}, opts = pool.filter(x => !seen[x.id] && (seen[x.id] = true));
+          const ans = yield* ask(state, { kind: 'pick', player: ctx.p, prompt: e.prompt || 'Search your deck: take which card?',
+            options: opts.map(x => ({ uid: x.uid, card: x.id, label: Cards.byId[x.id].name })) });
+          const c = pool.find(x => x.uid === ans.uid) || pool[0];
+          P.deck.splice(P.deck.indexOf(c), 1);
+          P.hand.push(c);
+          emit(state, { type: 'draw', player: ctx.p, n: 1, text: pname(state, ctx.p) + ' searches their deck and reveals ' + Cards.byId[c.id].name + '.' });
+        }
+        shuffle(state, P.deck);
+        return;
+      }
       case 'counter': if (src) src.counters[e.name] = (src.counters[e.name] || 0) + 1; return;
       case 'destroy': {
         for (const u of yield* targets(state, e.to, ctx)) {
@@ -993,8 +1025,8 @@
       const dealt = d > 0 ? yield* applyDamage(state, H, d, types, A, true) : 0;
       if (!dealt) log(state, cname(H) + ' takes no damage.');
       if (H === T) primaryDealt = dealt;
-      if (dealt > 0 && dealt - needed >= 5 && isCharacter(H) && H.owner !== A.owner) {
-        yield* gain(state, A.owner, (dealt - needed) + ' excess damage to a character');
+      if (dealt > 0 && dealt - needed >= 5 && H.owner !== A.owner) {
+        yield* gain(state, A.owner, 'overkill by ' + (dealt - needed));
       }
       results.push({ H, dealt });
     }
@@ -1809,6 +1841,8 @@
     v.me = p;
     v.players.forEach((P, q) => {
       P.deckCount = P.deck.length;
+      // Your own deck's contents (never its order) are public to you: you built it. Deck searches need this.
+      if (q === p) P.deckList = P.deck.map(c => c.id).sort();
       P.deck = [];
       P.handCount = P.hand.length;
       if (q !== p) {

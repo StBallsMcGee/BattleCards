@@ -120,12 +120,19 @@
     { id: 'tb_witness_protection', name: 'Witness Protection', type: 'powerup', art: '🛡️', target: 'ownUnit',
       effects: [{ do: 'mark', mark: 'untargetable', dur: 'next', to: 'target' }],
       text: 'One of your units cannot be targeted by attacks or effects until your next turn.', flavor: 'We keep them alive just long enough to matter.' },
+    { id: 'tb_case_file', name: 'Open Case File', type: 'powerup', art: '🗂️', target: 'none',
+      requires: { k: 'deckHas', find: { shiftOnly: true, shiftsOntoArena: true } }, requiresText: 'You need a detective in your Arena whose Threshold form is still in your deck.',
+      effects: [{ do: 'tutor', find: { shiftOnly: true, shiftsOntoArena: true }, prompt: 'Open Case File: whose file?' }, { do: 'tokens', token: 'E', n: 1, to: 'pickFriendly' }],
+      text: 'Search your deck for the Threshold form of a detective in your Arena and put it into your hand. Place 1 Evidence token on one of your units.', flavor: 'Some files are opened once and never closed.' },
+    { id: 'tb_interrogation', name: 'Interrogation', type: 'powerup', art: '💡', target: 'none',
+      effects: [{ do: 'draw', n: 2, nIf: { cond: { k: 'arenaTokens', token: 'E', min: 3 }, n: 3 } }],
+      text: 'Draw 2 cards. If there are 3 or more Evidence tokens in the Arena, draw 3 instead.', flavor: 'Everyone talks. The trick is listening to what they leave out.' },
   ];
   const deck = [
     ['tb_mara', 1], ['tb_mara_threshold', 1], ['tb_dex', 1], ['tb_dex_echo', 1], ['tb_constance', 1], ['tb_constance_path', 1], ['tb_harlan', 1], ['tb_harlan_turned', 1],
     ['tb_field_agent', 2], ['tb_archivist', 2], ['tb_enforcer', 2], ['tb_street_op', 2], ['tb_construct', 2], ['tb_witness', 2],
     ['tb_psi_hound', 2], ['tb_revenant', 2], ['tb_undercover', 2], ['tb_riot_sergeant', 2], ['tb_cultist', 2], ['tb_father', 2],
-    ['tb_scene', 2], ['tb_closed_case', 2], ['tb_protocol', 2], ['tb_witness_protection', 2],
+    ['tb_scene', 2], ['tb_closed_case', 1], ['tb_protocol', 2], ['tb_witness_protection', 1], ['tb_case_file', 1], ['tb_interrogation', 1],
   ];
   return { id: 'bureau', faction: 'Threshold Bureau', cards, deck,
     info: { id: 'threshold', name: 'The Threshold Bureau', colors: ['T', 'S'],

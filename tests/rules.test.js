@@ -209,7 +209,7 @@ test('Confused attackers hit themselves; Blinded attackers deal no damage', () =
   assert.equal(t2.damage, 0);
 });
 
-test('Favour: excess damage, character kill, Honourable, both Active defeated', () => {
+test('Favour: overkill, character kill, Honourable, both Active defeated', () => {
   const g = newGame();
   const v = place(g, 0, 'active', 0, 'valeria_champion'); // character
   const b = place(g, 0, 'active', 1, 'berserker');
@@ -222,16 +222,26 @@ test('Favour: excess damage, character kill, Honourable, both Active defeated', 
   ok(g, 0, { type: 'endPhase' });
   settle(g);
   const favour = g.state.players.map(P => P.favour);
-  // A: Brutal (Sunfire Edge) +1, both Active defeated +1, Valeria killed a character +1 = 3. B: Honourable +1.
-  assert.deepEqual(favour, [3, 1]);
+  // A: Brutal (Sunfire Edge) +1, both Active defeated +1, Valeria killed a character +1,
+  // Frenzied Axe (7) overkills the 2-HP fighter by 5 +1 = 4. B: Honourable +1.
+  assert.deepEqual(favour, [4, 1]);
 
   const g2 = newGame();
   const ber = place(g2, 0, 'active', 0, 'berserker');
   const c2 = place(g2, 1, 'active', 0, 'hale_junior', { damage: 9 });
   for (let i = 0; i < 3; i++) sup(g2, 0, 'gladiator_recruit');
   toFighting(g2);
-  attack(g2, ber, 1, c2); // 10 damage vs 1 needed → 9 excess to a character
-  assert.equal(g2.state.players[0].favour, 2, 'excess damage + Brutal');
+  attack(g2, ber, 1, c2); // 10 damage vs 1 needed → overkill by 9
+  assert.equal(g2.state.players[0].favour, 2, 'overkill + Brutal');
+
+  const g3 = newGame();
+  const ber3 = place(g3, 0, 'active', 0, 'berserker');
+  const f3 = place(g3, 1, 'active', 0, 'pit_hound', { damage: 0 });
+  f3.damage = E.hp(f3) - 2;
+  for (let i = 0; i < 2; i++) sup(g3, 0, 'gladiator_recruit');
+  toFighting(g3);
+  attack(g3, ber3, 0, f3); // 7 damage vs 2 needed → overkill by 5 on a fighter
+  assert.equal(g3.state.players[0].favour, 1, 'overkilling a fighter by 5 gains Favour');
 });
 
 test('two characters in the Active Zone grant Favour in Resolving', () => {
@@ -472,4 +482,41 @@ test('Loyal Crew: a Shift lets a crew fighter leave the Support Zone', () => {
   assert.equal(g.pending.kind, 'pick');
   ok(g, 0, { uid: crew.uid });
   assert.ok(g.state.players[0].ready.some(u => u && u.id === 'oa_hull'));
+});
+
+test('tutor power-ups search the deck for a matching card; they need a target to be played', () => {
+  const g = newGame();
+  const P = g.state.players[0];
+  P.hand.push({ uid: 'pw1', id: 'call_to_arms', owner: 0 }, { uid: 'pw2', id: 'ax_press_conference', owner: 0 });
+  assert.ok(E.validateAction(g.state, 0, { type: 'playPowerUp', cardUid: 'pw1', target: null }), 'no character in the Arena');
+  place(g, 0, 'ready', 0, 'valeria_pit');
+  P.deck.push({ uid: 'vc', id: 'valeria_champion', owner: 0 });
+  ok(g, 0, { type: 'playPowerUp', cardUid: 'pw1', target: null });
+  assert.equal(g.pending.kind, 'pick');
+  assert.deepEqual(g.pending.options.map(o => o.card), ['valeria_champion']);
+  ok(g, 0, { uid: 'vc' });
+  assert.ok(P.hand.some(c => c.uid === 'vc') && !P.deck.some(c => c.uid === 'vc'));
+
+  // Press Conference only finds the next Stage.
+  const g2 = newGame();
+  const P2 = g2.state.players[0];
+  P2.hand.push({ uid: 'pc', id: 'ax_press_conference', owner: 0 });
+  place(g2, 0, 'active', 0, 'ax_sov1');
+  P2.deck.push({ uid: 's3', id: 'ax_sov3', owner: 0 });
+  assert.ok(E.validateAction(g2.state, 0, { type: 'playPowerUp', cardUid: 'pc', target: null }), 'Stage 2 is not in the deck');
+  P2.deck.push({ uid: 's2', id: 'ax_sov2', owner: 0 });
+  ok(g2, 0, { type: 'playPowerUp', cardUid: 'pc', target: null });
+  assert.deepEqual(g2.pending.options.map(o => o.card), ['ax_sov2']);
+  ok(g2, 0, { uid: 's2' });
+  assert.ok(P2.hand.some(c => c.uid === 's2'));
+});
+
+test('conditional draw power-ups draw more when their condition holds', () => {
+  const g = newGame();
+  const P = g.state.players[0];
+  P.hand.push({ uid: 'sr', id: 'scouting_report', owner: 0 });
+  const before = P.hand.length;
+  place(g, 0, 'active', 0, 'valeria_pit');
+  ok(g, 0, { type: 'playPowerUp', cardUid: 'sr', target: null });
+  assert.equal(P.hand.length, before - 1 + 3);
 });
