@@ -10,7 +10,7 @@ A browser client for **Battle Cards**, with a full rules engine, animated drag-a
 | **Full game (online play)** | Download [`battle-cards.zip`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.zip), unzip it and run **Start Battle Cards** for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Online play needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version. |
 | **In the browser** | https://stballsmcgee.github.io/battlecards/ (once GitHub Pages is switched on: *Settings → Pages → Source: GitHub Actions*). |
 
-Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). To publish a new release, push a version tag (`git tag v1.0.1 && git push origin v1.0.1`); the Release workflow tests and builds the game, then attaches both files. You can also build them yourself with `npm run build` (output in `dist/`).
+Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). Every push to `main` runs the Release workflow, which tests and builds the game and attaches both files to the release for the version in `package.json`. To start a new release, bump `version` in `package.json`. You can also build them yourself with `npm run build` (output in `dist/`).
 
 On Mac, the first time you open the `.command` file you may need to right-click it and choose **Open**, because it isn't from an identified developer.
 

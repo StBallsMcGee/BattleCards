@@ -1,10 +1,10 @@
-# Builds the downloadable game and attaches it to a GitHub Release.
-# Push a version tag to publish:  git tag v1.0.1 && git push origin v1.0.1
+# Builds the downloadable game and attaches it to the GitHub Release for the version in package.json.
+# Every push to main refreshes that release's files; bump "version" in package.json to start a new release.
 name: Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -23,12 +23,16 @@ jobs:
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.ref_type == 'tag' && github.ref_name || format('build-{0}', github.run_number) }}
         run: |
+          TAG="v$(node -p "require('./package.json').version")"
           cat > notes.md <<'NOTES'
           **Quick play:** download `battle-cards.html` and double-click it. Tutorial, bots and deck builder work offline in any modern browser.
 
           **Full game (online play):** download `battle-cards.zip`, unzip it and run *Start Battle Cards* for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Online play needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version.
           NOTES
-          gh release create "$TAG" dist/battle-cards.html dist/battle-cards.zip \
-            --title "Battle Cards $TAG" --notes-file notes.md --target "$GITHUB_SHA"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/battle-cards.html dist/battle-cards.zip --clobber
+          else
+            gh release create "$TAG" dist/battle-cards.html dist/battle-cards.zip \
+              --title "Battle Cards $TAG" --notes-file notes.md --target "$GITHUB_SHA" --latest
+          fi
