@@ -90,7 +90,7 @@
 
   function setup(level, view) {
     const P = view.players[view.me];
-    const units = P.hand.filter(E.isUnitCard);
+    const units = P.hand.filter(c => E.isUnitCard(c) && !E.shiftOnly(c));
     const placements = [];
     if (level === 'easy') {
       const n = Math.min(units.length, 1 + Math.floor(Math.random() * 3));
@@ -102,7 +102,8 @@
     const candidates = units.filter(c => !(def(c).shift && def(c).shift.ontoOnly)).sort((a, b) => cardValueInHand(b) - cardValueInHand(a));
     const pool = candidates.length ? candidates : units;
     // Keep at least two units in hand to use as energy if we can.
-    const keep = level === 'hard' ? 2 : 1;
+    // Keep a couple of units back as energy — Shifted forms in hand already serve that purpose.
+    const keep = Math.max(0, (level === 'hard' ? 2 : 1) - P.hand.filter(c => E.isUnitCard(c) && E.shiftOnly(c)).length);
     const n = Math.max(1, Math.min(4, pool.length - Math.max(0, keep - (units.length - pool.length))));
     for (let i = 0; i < n; i++) {
       placements.push({ uid: pool[i].uid, zone: i < 2 ? 'active' : 'ready', index: i < 2 ? i : i - 2 });
@@ -112,21 +113,56 @@
 
   function powerUpTargets(view, c) {
     const me = view.me, P = view.players[me], O = view.players[1 - me];
+    if (def(c).target === 'none') return [null];
+    const uids = E.arenaUnits(P).concat(E.arenaUnits(O)).map(u => u.uid)
+      .concat(P.support.map(s => s.uid), O.support.map(s => s.uid), P.grave.map(g => g.uid));
+    return uids.filter(t => !E.validateAction(view, me, { type: 'playPowerUp', cardUid: c.uid, target: t }));
+  }
+
+  /** Generic value of a data-driven Power Up (effects list). */
+  function scoreEffects(view, c, t) {
+    const me = view.me, P = view.players[me], O = view.players[1 - me];
     const d = def(c);
-    switch (d.target) {
-      case 'none': return [null];
-      case 'ownUnit': return E.arenaUnits(P).map(u => u.uid);
-      case 'ownActive': return P.active.filter(Boolean).map(u => u.uid);
-      case 'ownGraveUnit': return P.grave.filter(E.isUnitCard).map(x => x.uid);
-      case 'oppSupport': return O.support.map(s => s.uid);
-      case 'ownSupportFighter': return P.support.filter(s => def(s).type === 'fighter').map(s => s.uid);
+    const u = t ? E.unitByUid(view, t) : null;
+    const enemy = u && u.owner !== me;
+    let s = 0;
+    for (const e of d.effects) {
+      if (e.if && !E.cond(view, e.if, { p: me, target: u })) continue;
+      switch (e.do) {
+        case 'tokens': s += e.token === 'P' ? 1.5 * e.n : (e.n === 'double' ? (u ? Math.min(4, E.TOKEN_KINDS.reduce((a, k) => a + u.tokens[k], 0)) : 0) : (e.n || 1)) * (enemy ? -0.5 : 1); break;
+        case 'damage': s += e.to === 'allUnits' ? (E.arenaUnits(O).length - E.arenaUnits(P).length) * e.n * 0.6 : e.n; break;
+        case 'removeTokens': s += u ? (e.damagePer || 1) * Math.max(0, E.TOKEN_KINDS.reduce((a, k) => a + (e.token === 'all' || e.token === k ? u.tokens[k] : 0), 0)) : 0; break;
+        case 'draw': s += P.hand.length <= 4 && P.deckCount > 8 ? 2 * e.n : 0; break;
+        case 'favour': s += 6; break;
+        case 'heal': s += u ? Math.min(e.n === 'd6' ? 3.5 : e.n, u.damage) : 0; break;
+        case 'recall': s += 4; break;
+        case 'fromSupport': case 'toActive': s += 2.5; break;
+        case 'toReady': s += u && u.damage > E.hp(u) / 2 ? 3 : 0.3; break;
+        case 'destroy': s += -2; break;
+        case 'chooseStatus': s += 3; break;
+        case 'cleanse': s += E.arenaUnits(P).reduce((a, x) => a + x.statuses.length, 0) * 1.5; break;
+        case 'flag': s += 1; break;
+        case 'contaminateCheck': s += 1; break;
+        case 'mark': {
+          const good = { untargetable: 2.5, undying: u && remaining(u) < 8 ? 4 : 1.5, freeAttack: 5, interveneAny: 2, bonusDie: 2.5, unparryable: 0.5, grantParry: 1.5,
+            ignoreShiftCond: 0, canShiftNow: 0, plusDamage: 2, regen: 2, shiftOnKill: 0.5, noAttack: 3.5 }[e.mark];
+          s += good || 1;
+          if (e.mark === 'ignoreShiftCond' && u) {
+            // Only worth it if a matching upgrade is in hand or support.
+            const up = P.hand.concat(P.support).some(x => def(x).shift && def(x).baseName === E.baseName(u) && def(x).hp > def(u).hp);
+            s += up ? 5 : -5;
+          }
+          break;
+        }
+      }
     }
-    return [];
+    return s;
   }
 
   /** Scores playing power-up c on target t (higher is better; <= 0 means don't). */
   function scorePowerUp(view, c, t) {
     const me = view.me, P = view.players[me], O = view.players[1 - me];
+    if (def(c).effects) return scoreEffects(view, c, t);
     const e = def(c).effect;
     const u = t ? E.unitByUid(view, t) : null;
     const loc = t ? E.locate(view, t) : null;
@@ -181,7 +217,7 @@
         const a = { type: 'playPowerUp', cardUid: c.uid, target: t };
         if (!legal(view, a)) continue;
         let s = scorePowerUp(view, c, t);
-        if (phaseFilter && !phaseFilter(def(c).effect)) continue;
+        if (phaseFilter && !phaseFilter(def(c).effect || { type: 'effects' })) continue;
         if (level === 'easy') s = s > 0 ? Math.random() * 3 : 0;
         if (s > 0.5 && (!best || s > best.s)) best = { a, s };
       }
@@ -210,7 +246,7 @@
           let s = d.energy.reduce((x, t) => x + need[t], 0) / d.energy.length * 3 - cardValueInHand(c) * 0.3;
           if (d.shift && !d.shift.ontoOnly) s += 2;           // can come back via Shift
           if (d.keywords.includes('Veteran')) s += 2;          // can come back via Veteran
-          if (d.shift && d.shift.ontoOnly) s -= 4;             // keep upgrades in hand
+          if (d.shift && d.shift.ontoOnly) s += 5;             // Shifted forms: energy now, and they can still Shift from Support
           if (level === 'easy') s = Math.random();
           if (!best || s > best.s) best = { c, s };
         }
@@ -241,6 +277,7 @@
       const slots = E.emptySlots(P.ready);
       const playable = handUnits.filter(c => {
         const d = def(c);
+        if (E.shiftOnly(c)) return false;
         // Hold upgrades if the base character is already in the Arena (to Shift later).
         if (level !== 'easy' && d.type === 'character' && d.shift && d.shift.ontoOnly &&
           E.arenaUnits(P).some(u => def(u).baseName === d.baseName)) return false;
@@ -267,6 +304,7 @@
       for (let i = 0; i < abs.length; i++) {
         const a = { type: 'ability', unitUid: u.uid, abilityIndex: i };
         if (!legal(view, a)) continue;
+        if (abs[i].selfDamage && remaining(u) <= abs[i].selfDamage + 5) continue;
         if (!abs[i].cost.length || (level === 'easy' ? Math.random() < 0.5 : spare >= abs[i].cost.length)) return a;
       }
     }
@@ -425,6 +463,10 @@
 
   function resolving(level, view) {
     const me = view.me, P = view.players[me];
+    for (const u of E.arenaUnits(P)) {
+      const a = { type: 'transform', unitUid: u.uid };
+      if (def(u).transform && legal(view, a)) return a;
+    }
     // Shift whenever it is legal and improves the unit.
     if (level !== 'easy' || Math.random() < 0.6) {
       const shifts = [];
@@ -456,6 +498,7 @@
   function tokens(level, view, c) {
     if (level === 'easy') return { n: Math.random() < 0.5 ? c.max : 0 };
     if (c.purpose === 'negate' || c.purpose === 'roll') return { n: c.max };
+    if (c.purpose === 'bonus') return { n: c.max };
     if (c.purpose === 'damage') {
       const T = E.unitByUid(view, c.targetUid);
       if (!T) return { n: 0 };
@@ -489,6 +532,23 @@
     return { uids: sorted.slice(0, c.n).map(x => x.uid) };
   }
 
+  function pickUnit(level, view, c) {
+    if (level === 'easy' || !c.options.length) return { uid: c.options.length ? pick(c.options).uid : null };
+    const me = view.me;
+    const units = c.options.map(o => ({ o, u: E.unitByUid(view, o.uid) }));
+    const heal = /heal/i.test(c.prompt || '');
+    const score = ({ u, o }) => {
+      if (!u) return 1; // a card in the Support Zone (Loyal Crew)
+      if (u.owner !== me) return 50 - remaining(u) + (u.tokens.E || 0) + (u.tokens.V || 0);
+      if (heal) return u.damage;
+      // Friendly: favour units close to a Shift threshold, then the strongest.
+      const thr = def(u).threshold || 0;
+      return (thr ? 10 - Math.max(0, thr - (u.tokens.V || 0)) * 2 : 0) + unitValue(u) / 4;
+    };
+    units.sort((a, b) => score(b) - score(a));
+    return { uid: units[0].o.uid };
+  }
+
   function decide(level, view, choice) {
     switch (choice.kind) {
       case 'firstPlayer': return { first: level === 'easy' && Math.random() < 0.5 ? 1 - view.me : view.me };
@@ -497,6 +557,16 @@
       case 'reaction': return reaction(level, view, choice);
       case 'veteran': return { slot: level === 'easy' && Math.random() < 0.4 ? -1 : choice.slots[0] };
       case 'discard': return discard(level, view, choice);
+      case 'pick': return pickUnit(level, view, choice);
+      case 'option': {
+        const i = choice.options.indexOf('Confused');
+        if (i >= 0) return { index: i };
+        const need = energyNeeds(view);
+        const types = ['M', 'A', 'T', 'S'];
+        let best = 0;
+        choice.options.forEach((o, k) => { const t = types.find(x => Cards.TYPE_NAMES[x] === o); if (t && need[t] > need[types[best]]) best = k; });
+        return { index: Math.min(best, choice.options.length - 1) };
+      }
       case 'main': {
         let a;
         if (choice.phase === 'arming') a = arming(level, view);

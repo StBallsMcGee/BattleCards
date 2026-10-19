@@ -92,7 +92,7 @@
       text: '<p>Both attacks are declared — the arrows show them. You can resolve them one at a time with <b>▶ Resolve</b> (you choose the order), or all at once.</p><div class="coach-do">Click <b>Resolve attacks ▶</b>.</div>',
       hl: () => [$('#main-btn'), $('#center-band')], allow: a => a.type === 'endPhase' || a.type === 'resolve', deny: 'Resolve your attacks.' },
     { title: 'Defeated!', when: v => isMain(v, 'resolving') && v.turn === 1, pos: 'right',
-      text: '<p>2 + 2 damage defeated the 4-HP Recruit. <b>Defeated</b> units stay put until the <b>Resolving phase</b>, then they die and go to the Graveyard — that just happened.</p>' +
+      text: '<p>4 + 4 damage defeated the 8-HP Recruit. <b>Defeated</b> units stay put until the <b>Resolving phase</b>, then they die and go to the Graveyard — that just happened.</p>' +
         '<p>In Resolving you can also move Ready units into empty Active slots and <b>Shift</b> characters (more on that later).</p><div class="coach-do">Click <b>End Turn</b>.</div>',
       hl: () => [$('#main-btn')], allow: a => a.type === 'endPhase', deny: 'Click "End Turn".' },
     { title: "Brutus's turn", when: v => v.active === 1 && v.turn === 2, wait: true, pos: 'right',
@@ -117,7 +117,7 @@
       text: '<div class="coach-do">Click <b>Resolve attacks ▶</b>.</div>',
       hl: () => [$('#main-btn')], allow: a => a.type === 'endPhase' || a.type === 'resolve', deny: 'Resolve your attack.' },
     { title: 'End your turn', when: v => isMain(v, 'resolving') && v.turn === 3, pos: 'right',
-      text: '<p>Pit Hound is down to 2 HP. Your Pikeman is still untapped, ready to pay for a Counterattack on Brutus\'s turn.</p><div class="coach-do">Click <b>End Turn</b>.</div>',
+      text: '<p>Pit Hound is down to 4 HP. Your Pikeman is still untapped, ready to pay for a Counterattack on Brutus\'s turn.</p><div class="coach-do">Click <b>End Turn</b>.</div>',
       hl: () => [$('#main-btn')], allow: a => a.type === 'endPhase', deny: 'Click "End Turn".' },
     { title: 'Be ready to react', when: v => v.active === 1 && v.turn === 4, wait: true, pos: 'right',
       text: '<p>Brutus is attacking. Watch for the <b>Parry</b> roll — Iron Legionnaire has Parry: on a 5+ it halves the damage.</p>' },
@@ -126,7 +126,7 @@
       hl: () => [$('#prompt .btn.gold')], allow: a => a.option === 0, deny: 'Choose Shield Bash to counterattack.' },
     { title: 'Brutal finish', when: v => isMain(v, 'arming') && v.turn === 5, pos: 'right',
       text: '<p>The crowd loves a show. <b>Favour</b> is earned by spectacular plays — reach <b>10</b> to win. One way: a <b>Brutal</b> attack that Defeats a unit gives +1 Favour.</p>' +
-        '<p>Arena Brawler\'s <b>Pile Driver</b> is Brutal and deals 4 — exactly enough to finish the wounded Pit Hound.</p><div class="coach-do">Click <b>To Fighting ⚔</b>.</div>',
+        '<p>Arena Brawler\'s <b>Pile Driver</b> is Brutal and deals 8 — more than enough to finish the wounded Pit Hound.</p><div class="coach-do">Click <b>To Fighting ⚔</b>.</div>',
       hl: () => [$('#main-btn')], allow: a => a.type === 'endPhase', deny: 'Click "To Fighting".' },
     { title: 'Pile Driver!', when: v => isMain(v, 'fighting') && v.turn === 5 && !v.declared.length,
       text: '<div class="coach-do">Declare <b>Arena Brawler → Pile Driver</b> on the <b>Pit Hound</b>, then resolve.</div>',

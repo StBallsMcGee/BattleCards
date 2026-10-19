@@ -68,16 +68,26 @@
 <p>Inflicted on a 4+ after the attack resolves. Statuses don't stack, stay through Retreat, and are removed by Shifting or leaving the Arena. Status damage can't be Parried but can be negated by matching tokens.</p>
 
 <h3>11. Attack keywords</h3>
-${kw(['Blinding', 'Brutal', 'Burn', 'Confuse', 'Headshot', 'Long Ranged', 'Poison', 'Salvo', 'Counterattack', 'Intervention'])}
+${kw(['Binding', 'Blinding', 'Brutal', 'Burn', 'Confuse', 'Headshot', 'Long Ranged', 'Poison', 'Salvo', 'Counterattack', 'Intervention'])}
 <h3>12. Unit &amp; token keywords</h3>
 ${kw(['Embolden', 'Honourable', 'Parry', 'Resonance', 'Shift', 'Veteran', 'Armour', 'Meditate', 'Sharpen', 'Strategize', 'Calibrate'])}
 
-<h3>13. Implementation notes</h3>
+<h3>13. Faction rules (the five deck sets)</h3>
+${kw(['Resonance', 'Evidence', 'Pressure', 'Voidborn', 'Void', 'Loyal Crew'])}
+<ul>
+<li><b>Shifted forms</b> — a character version that says "Shift onto … only" can only enter the Arena by Shifting. You can still play it as energy and Shift it from your Support Zone later.</li>
+<li><b>Flip cards</b> (Vantage, Null, Phalanx) turn into their second form in your Resolving phase once the listed condition is met.</li>
+<li><b>Effect damage</b> from triggers and Power Ups is not an attack: it can't be Parried or negated with tokens and never triggers reactions.</li>
+<li><b>Area attacks</b> ("all") hit every opposing Active unit; only the main target can react.</li>
+<li>Temporary effects shown as icons on units: 🫥 untargetable · 🎯 must be targeted · 🧱 guarding · ♾️ cannot be killed · ½ deals half damage · ⛔ cannot attack · 🔇 cannot react · 🎲 bonus die.</li>
+</ul>
+
+<h3>14. Implementation notes</h3>
 <p class="muted">Where the rulebook leaves room for interpretation, this client does the following:
 a unit that took lethal damage can still Counterattack (the Defeat check is step 7, after reactions);
 a Blinded attack deals no damage but still rolls for its status keywords;
 a Confused attack skips its effects on the target; Parry is rolled automatically, and spending tokens on a roll is offered only when it would change the result;
 Embolden applies when both units have <i>declared</i> attacks; payments are chosen automatically unless "manual payment" is turned on in Settings.
-Factions (Vaultborne, Scellian SIB) are tagged on cards; their mechanics aren't in the rulebook yet.</p>
+The core-set factions (Vaultborne, Scellian SIB) are tags only; the five deck sets add their own mechanics above.</p>
 `;
 })();

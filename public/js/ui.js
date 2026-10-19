@@ -189,7 +189,7 @@
     $(sel).innerHTML =
       '<div class="pi-row"><div class="pi-avatar">' + (p === UI.me ? '🛡' : (UI.opts.oppAvatar || '👹')) + '</div>' +
       '<div class="pi-name">' + esc(P.name) + (isActive ? ' <span class="pi-turn">● turn</span>' : '') + '</div></div>' +
-      '<div class="favour" title="Favour — reach 10 to win">' + favourDial(P.favour) + '</div>' +
+      '<div class="favour" title="Favour — reach 10 to win. Click for the history.">' + favourDial(P.favour) + '</div>' +
       '<div class="pi-piles">' +
       '<div class="pile deck" data-pile="deck" data-owner="' + rel(p) + '" title="Deck">' + R.back({ w: 46 }) + '<b>' + P.deckCount + '</b></div>' +
       '<div class="pile grave" data-pile="grave" data-owner="' + rel(p) + '" title="Graveyard — click to view">' +
@@ -356,17 +356,17 @@
     if (d.type !== 'powerup') {
       if (v.phase === 'arming') {
         const targets = [0, 1, 2].map(i => ({ el: slotEl('me', 'ready', i), action: { type: 'playReady', cardUid: uid, index: i } })).filter(t => !legal(t.action));
-        const err = legal({ type: 'playReady', cardUid: uid, index: E.emptySlots(P.ready)[0] });
+        const err = legal({ type: 'playReady', cardUid: uid, index: E.emptySlots(P.ready)[0] != null ? E.emptySlots(P.ready)[0] : 0 });
         opts.push({ label: '⬆ Play to Ready Zone', targets, disabled: !targets.length, reason: err });
         const sa = { type: 'playSupport', cardUid: uid };
         const se = legal(sa);
         opts.push({ label: '⚡ Play as energy (' + d.energy.map(t => C.TYPE_NAMES[t]).join('/') + ')', action: sa, dropEl: $('#me-support'), disabled: !!se, reason: se });
       }
-      if (v.phase === 'resolving' && d.shift) {
+      if (d.shift) {
         for (const u of E.arenaUnits(P)) {
           const a = { type: 'shift', cardUid: uid, onto: u.uid };
           const e = legal(a);
-          if (def(u).baseName === d.baseName && u.id !== c.id) opts.push({ label: '⧉ Shift onto ' + def(u).name, action: a, dropEl: unitEl(u.uid), disabled: !!e, reason: e, cost: d.shift.cost });
+          if (E.baseName(u) === d.baseName && u.id !== c.id && (v.phase === 'resolving' || !e)) opts.push({ label: '⧉ Shift onto ' + def(u).name, action: a, dropEl: unitEl(u.uid), disabled: !!e, reason: e, cost: d.shift.cost });
         }
       }
     } else {
@@ -377,8 +377,8 @@
         opts.push({ label: '✨ Use ' + d.name, action: a, disabled: !!e, reason: e });
       } else {
         const ok = targets.filter(t => !legal(t.action));
-        const e = ok.length ? null : (P.playedPowerUp ? 'You may only play one Power Up per turn.' : 'No valid target.');
-        opts.push({ label: '✨ Use ' + d.name + ' (choose target)', targets: ok, disabled: !ok.length, reason: e, graveTargets: d.target === 'ownGraveUnit' });
+        const e = ok.length ? null : (P.playedPowerUp ? 'You may only play one Power Up per turn.' : legal(targets[0] ? targets[0].action : { type: 'playPowerUp', cardUid: uid, target: '' }) || 'No valid target.');
+        opts.push({ label: '✨ Use ' + d.name + ' (choose target)', targets: ok, disabled: !ok.length, reason: e, graveTargets: ok.some(t => !t.el) });
       }
     }
     return opts;
@@ -386,14 +386,13 @@
 
   function powerUpTargets(c) {
     const v = UI.view, P = v.players[UI.me], O = v.players[1 - UI.me];
-    const d = def(c), mk = (el, target) => ({ el, action: { type: 'playPowerUp', cardUid: c.uid, target } });
-    switch (d.target) {
-      case 'ownUnit': case 'ownActive': return E.arenaUnits(P).map(u => mk(unitEl(u.uid), u.uid));
-      case 'oppSupport': return O.support.map(s => mk($('#opp-support [data-uid="' + s.uid + '"]'), s.uid));
-      case 'ownSupportFighter': return P.support.map(s => mk($('#me-support [data-uid="' + s.uid + '"]'), s.uid));
-      case 'ownGraveUnit': return P.grave.map(g => mk(null, g.uid));
-    }
-    return [];
+    const mk = (el, target) => ({ el, action: { type: 'playPowerUp', cardUid: c.uid, target } });
+    const out = [];
+    for (const u of E.arenaUnits(P).concat(E.arenaUnits(O))) out.push(mk(unitEl(u.uid), u.uid));
+    for (const s2 of P.support) out.push(mk($('#me-support [data-uid="' + s2.uid + '"]'), s2.uid));
+    for (const s2 of O.support) out.push(mk($('#opp-support [data-uid="' + s2.uid + '"]'), s2.uid));
+    for (const g of P.grave) out.push(mk(null, g.uid));
+    return out;
   }
 
   function unitOptions(uid) {
@@ -417,6 +416,11 @@
         opts.push({ label: '✧ ' + ab.name, cost: ab.cost, action: a, disabled: !!e, reason: e });
       });
     }
+    if (d.transform && v.phase === 'resolving') {
+      const a = { type: 'transform', unitUid: uid };
+      const e = legal(a);
+      opts.push({ label: '⟳ Flip into ' + C.byId[d.transform.into].name, action: a, disabled: !!e, reason: e });
+    }
     if (l.zone === 'active' && v.phase === 'fighting') {
       const O = v.players[1 - UI.me];
       d.attacks.forEach((atk, i) => {
@@ -432,7 +436,7 @@
   function supportOptions(uid) {
     const v = UI.view, P = v.players[UI.me];
     const s = P.support.find(x => x.uid === uid);
-    if (!s || v.phase !== 'resolving') return [];
+    if (!s || !['arming', 'fighting', 'resolving'].includes(v.phase)) return [];
     const d = def(s);
     if (!d.shift) return [];
     const opts = [];
@@ -445,8 +449,12 @@
       const a = { type: 'shift', cardUid: uid, onto: u.uid };
       if (!legal(a)) targets.push({ el: unitEl(u.uid), action: a });
     }
-    const probe = legal({ type: 'shift', cardUid: uid, zone: 'ready', index: E.emptySlots(P.ready)[0] != null ? E.emptySlots(P.ready)[0] : 0 });
-    opts.push({ label: '⧉ Shift into the Arena', cost: d.shift.cost, targets, disabled: !targets.length, reason: probe });
+    if (v.phase !== 'resolving' && !targets.length) return [];
+    const ontoBase = E.arenaUnits(P).find(u => E.baseName(u) === d.baseName && u.id !== d.id);
+    const probe = d.shift.ontoOnly && ontoBase ? legal({ type: 'shift', cardUid: uid, onto: ontoBase.uid })
+      : d.shift.ontoOnly ? 'Needs ' + d.baseName + ' in your Arena to Shift onto.'
+      : legal({ type: 'shift', cardUid: uid, zone: 'ready', index: E.emptySlots(P.ready)[0] != null ? E.emptySlots(P.ready)[0] : 0 });
+    opts.push({ label: '⧉ Shift ' + (d.shift.ontoOnly ? 'onto ' + d.baseName : 'into the Arena'), cost: d.shift.cost, targets, disabled: !targets.length, reason: probe });
     return opts;
   }
 
@@ -466,6 +474,8 @@
       return;
     }
     if (t.closest('#prompt') || t.closest('#side') || t.closest('#popmenu') || t.closest('#coach')) return;
+    const fav = t.closest('.favour');
+    if (fav) { showFavourLog(fav.closest('#me-info') ? UI.me : 1 - UI.me); return; }
     const pile = t.closest('.pile.grave');
     if (pile) { showGrave(pile.dataset.owner === 'me' ? UI.me : 1 - UI.me); return; }
 
@@ -736,6 +746,14 @@
     $$('[data-card-id]', m.el).forEach(x => x.addEventListener('pointerleave', hidePreview));
   }
 
+  function showFavourLog(p) {
+    const P = UI.view.players[p];
+    const list = (UI.favourLog || [[], []])[p];
+    modal('<h3>' + esc(P.name) + ' — Favour ' + P.favour + '/10</h3><div class="fav-history">' +
+      (list.length ? list.map(f => '<div>Turn ' + f.turn + ': <b>+' + f.n + '</b> — ' + esc(f.reason) + '</div>').join('') : '<p class="muted">No Favour gained yet.</p>') +
+      '</div><p class="muted" style="max-width:420px">Favour comes from: 5+ excess damage to a character · your character killing a character · defeating both enemy Active units in one turn · two characters in your Active Zone at the end of your turn · your Honourable unit dying · a Brutal attack defeating a unit · some card effects.</p>');
+  }
+
   function openGameMenu() {
     const m = modal('<h3>Menu</h3><div class="col-buttons">' +
       '<button class="btn" data-m="rules">📖 Rules reference</button>' +
@@ -786,6 +804,23 @@
         return;
       }
       case 'tokens': return tokenPrompt(view, c, unitName);
+      case 'pick': {
+        const p = showPrompt('<h3>' + esc(c.prompt || 'Choose a unit') + '</h3><div class="pick-grid">' +
+          c.options.map(o => '<button class="btn" data-u="' + o.uid + '">' + esc(o.label) + '</button>').join('') +
+          (c.optional ? '<button class="btn subtle" data-u="">No thanks</button>' : '') + '</div>', 'urgent');
+        $$('[data-u]', p).forEach(b => {
+          b.onclick = () => send({ uid: b.dataset.u || null });
+          const el = b.dataset.u && unitEl(b.dataset.u);
+          if (el) { b.onmouseenter = () => el.classList.add('targetable'); b.onmouseleave = () => el.classList.remove('targetable'); }
+        });
+        return;
+      }
+      case 'option': {
+        const p = showPrompt('<h3>' + esc(c.prompt || 'Choose') + '</h3><div class="pick-grid">' +
+          c.options.map((o, i) => '<button class="btn" data-i="' + i + '">' + esc(o) + '</button>').join('') + '</div>', 'urgent');
+        $$('[data-i]', p).forEach(b => b.onclick = () => send({ index: +b.dataset.i }));
+        return;
+      }
       case 'reaction': {
         const p = showPrompt('<h3>↩ Reaction!</h3><p>' + esc(unitName(c.attackerUid)) + ' hit ' + esc(unitName(c.targetUid)) + '. React with an attack against ' + esc(unitName(c.attackerUid)) + '?</p>' +
           '<div class="col-buttons">' + c.options.map((o, i) => {
@@ -818,6 +853,20 @@
     }
   }
 
+  /** Lists exactly which units' tokens this decision can spend (the unit itself, plus Resonance partners). */
+  function tokenSources(view, u, c) {
+    if (!u) return '';
+    const holders = E.tokenHolders(view, u);
+    const kinds = c.purpose === 'bonus' ? [c.token] : E.TOKEN_KINDS.filter(k => E.TOKEN_BASE[k] && (!c.types || c.types.includes(E.TOKEN_BASE[k])));
+    return holders.map(h => {
+      const t = {};
+      for (const k of kinds) if (h.tokens[k]) t[k] = h.tokens[k];
+      const pipsHtml = R.tokenPips(t);
+      if (!pipsHtml) return '';
+      return '<div class="muted">' + pipsHtml + ' on ' + esc(def(h).name) + (h === u ? '' : ' <i>(shared through Resonance)</i>') + '</div>';
+    }).join('');
+  }
+
   function tokenPrompt(view, c, unitName) {
     const u = E.unitByUid(view, c.unitUid);
     let title, body, defaultN = c.max;
@@ -829,6 +878,11 @@
       if (!UI.settings.askRoll) { send({ n: c.max }); return; }
       title = '🎲 Boost the roll?';
       body = esc(unitName(c.unitUid)) + ' rolled <b>' + c.roll + '</b> for ' + esc(c.rollPurpose) + ' (needs ' + c.need + '+). Spend tokens for +1 each?';
+    } else if (c.purpose === 'bonus') {
+      const t = E.unitByUid(view, c.targetUid);
+      title = '🔍 Spend ' + C.TOKEN_NAMES[c.token] + ' tokens?';
+      body = c.setTo ? 'Spend 1 ' + C.TOKEN_NAMES[c.token] + ' token so ' + esc(unitName(c.unitUid)) + ' deals <b>' + c.setTo + '</b> damage instead of ' + c.damage + '?'
+        : 'Each ' + C.TOKEN_NAMES[c.token] + ' token spent adds +' + c.per + ' damage to ' + esc(unitName(c.unitUid)) + "'s attack on " + esc(t ? def(t).name : '?') + ' (currently ' + c.damage + ').';
     } else {
       const t = E.unitByUid(view, c.targetUid);
       title = '💥 Add tokens to the damage?';
@@ -838,7 +892,7 @@
     }
     let n = defaultN;
     const p = showPrompt('<h3>' + title + '</h3><p>' + body + '</p><div class="stepper"><button class="btn small" data-d="-1">−</button><span class="sv"></span><button class="btn small" data-d="1">+</button>' +
-      '<span class="muted"> of ' + c.max + ' (' + R.tokenPips(u ? u.tokens : {}) + ')</span></div>' +
+      '<span class="muted"> of ' + c.max + '</span></div><div class="tok-sources">' + tokenSources(view, u, c) + '</div>' +
       '<div class="row"><button class="btn gold" data-ok>Spend</button><button class="btn" data-no>Don\'t spend</button></div>', 'urgent');
     const upd = () => { $('.sv', p).textContent = n; $('[data-ok]', p).textContent = n ? 'Spend ' + n : 'Confirm (0)'; };
     upd();
@@ -980,6 +1034,7 @@
   }
 
   function logEvent(ev) {
+    if (ev.type === 'favour' && UI.favourLog) UI.favourLog[ev.player].push({ turn: ev.turn, n: ev.n, reason: ev.reason });
     if (!ev.text) return;
     const log = $('#log');
     if (!log) return;
@@ -1090,6 +1145,7 @@
     UI.sel = null;
     UI.view = null;
     UI.hooks = opts.hooks || {};
+    UI.favourLog = [[], []];
     $('#modal-layer').innerHTML = '';
     buildBoard();
   };

@@ -382,3 +382,30 @@ code { background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 5px; 
 .rules-body th { color: var(--gold); }
 .rules-body .box { border: 1px solid var(--panel-b); background: #e9c46a14; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; break-inside: avoid; }
 .rules-modal { width: 1200px; }
+
+/* ───────── Deck sets: new tokens, effects and art ───────── */
+:root { --E: #3f8f86; --P: #b8432f; --V: #3a2457; }
+.pip.e-E, .tok.e-E { background: var(--E); }
+.pip.e-P, .tok.e-P { background: var(--P); }
+.pip.e-V, .tok.e-V { background: var(--V); box-shadow: 0 0 0.25em #a07bff; }
+.c-cost .free { font-size: 0.8em; font-style: italic; color: #6b5a40; }
+.c-art { overflow: hidden; }
+.c-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.c-atext { font-size: 0.85em; color: #3d2f1c; }
+.c-passive { font-size: 0.88em; background: #3a245711; border-left: 0.2em solid #6a4ca8; padding: 0.05em 0.25em; border-radius: 0.2em; }
+.c-trigger { font-size: 0.88em; background: #b8862b14; border-left: 0.2em solid var(--gold2); padding: 0.05em 0.25em; border-radius: 0.2em; }
+.c-thresh { font-size: 0.88em; font-weight: 700; color: #3a2457; }
+.c-body.dense { font-size: 0.66em; gap: 0.18em; }
+.c-body.denser { font-size: 0.58em; gap: 0.12em; line-height: 1.15; }
+.u-tokens.resonance .tok { box-shadow: 0 0 0 0.12em #fff, 0 0 0.6em #9be0ff; }
+.u-status .mk { font-size: 0.8em; background: #000a; border-radius: 0.4em; padding: 0 0.15em; }
+.set-elementals .c-frame { box-shadow: inset 0 0 0 0.12em #ffffff66; }
+.set-hollowing .c-frame { background: linear-gradient(170deg, #e7e0f0, #cfc3dc) padding-box, linear-gradient(135deg, var(--ec, #777), #2a1640) border-box; }
+.set-bureau .c-frame { background: linear-gradient(170deg, #e9eef0, #cfd8dc) padding-box, linear-gradient(135deg, var(--ec, #777), var(--ec2, var(--ec, #777))) border-box; }
+.set-octo .c-frame { background: linear-gradient(170deg, #e6f4f6, #c9e3e8) padding-box, linear-gradient(135deg, var(--ec, #777), var(--ec2, var(--ec, #777))) border-box; }
+.set-apex .c-frame { background: linear-gradient(170deg, #f6eedd, #e3d2ab) padding-box, linear-gradient(135deg, var(--ec, #777), #c9a24e) border-box; }
+.fav-history { max-width: 420px; }
+.fav-history div { padding: 3px 0; border-bottom: 1px solid #ffffff10; font-size: 13px; }
+.favour { cursor: help; }
+.pick-grid { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow: auto; margin-bottom: 8px; }
+.db-sets { display: flex; gap: 6px; flex-wrap: wrap; }

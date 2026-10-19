@@ -60,9 +60,9 @@
 
   function drawCollection() {
     const q = $('#db-search').value.trim().toLowerCase();
-    const type = $('#db-type').value, en = $('#db-energy').value;
+    const type = $('#db-type').value, en = $('#db-energy').value, set = $('#db-set').value;
     const n = counts();
-    const cards = C.CARDS.filter(c => (!type || c.type === type) && (!en || (c.energy && c.energy.includes(en))) &&
+    const cards = C.CARDS.filter(c => !c.flipSide && (!set || (set === 'core' ? !c.set : c.set === set)) && (!type || c.type === type) && (!en || (c.energy && c.energy.includes(en))) &&
       (!q || (c.name + ' ' + (c.keywords || []).join(' ') + ' ' + (c.attacks || []).map(a => a.name + ' ' + a.keywords.join(' ')).join(' ') + ' ' + (c.faction || '')).toLowerCase().includes(q)));
     $('#db-collection').innerHTML = cards.map(c => {
       const max = c.type === 'character' ? 1 : 2;
@@ -114,6 +114,8 @@
   }
 
   function bind() {
+    $('#db-set').innerHTML = '<option value="">All sets</option><option value="core">Core set</option>' + C.SETS.map(st => '<option value="' + st.id + '">' + R.esc(st.info.name) + '</option>').join('');
+    $('#db-set').onchange = drawCollection;
     $('#db-search').oninput = drawCollection;
     $('#db-type').onchange = drawCollection;
     $('#db-energy').onchange = drawCollection;

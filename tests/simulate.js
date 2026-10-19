@@ -36,7 +36,8 @@ const allKinds = {};
 for (const [a, b] of matchups) {
   let wa = 0, wb = 0, dr = 0, turns = 0;
   for (let i = 0; i < N; i++) {
-    const da = Cards.PRESET_DECKS[i % 4].cards, db = Cards.PRESET_DECKS[(i + 1 + (i >> 2)) % 4].cards;
+    const D = Cards.PRESET_DECKS.length;
+    const da = Cards.PRESET_DECKS[i % D].cards, db = Cards.PRESET_DECKS[(i + 1 + (i >> 2)) % D].cards;
     // Alternate seats so seat order does not bias the result.
     const swap = i % 2 === 1;
     const levels = swap ? [b, a] : [a, b];

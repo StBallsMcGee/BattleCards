@@ -1,0 +1,7 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="css/style.css">
+<style>html,body{overflow:auto!important;height:auto}#sheet{display:flex;flex-wrap:wrap;gap:12px;padding:12px;background:#120e0b;width:1560px}</style></head><body>
+<div id="sheet"></div>
+<script src="js/sets/elementals.js"></script><script src="js/sets/bureau.js"></script><script src="js/sets/apex.js"></script><script src="js/sets/octo.js"></script><script src="js/sets/hollowing.js"></script>
+<script src="js/cards.js"></script><script src="js/render.js"></script>
+<script>const ids=(location.hash.slice(1)||'').split(',');document.getElementById('sheet').innerHTML=ids.map(id=>BCRender.card(id,{w:200})).join('');</script>
+</body></html>

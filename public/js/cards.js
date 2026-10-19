@@ -48,270 +48,270 @@
 
   const CARDS = [
     // ───────────── Martial fighters ─────────────
-    { id: 'gladiator_recruit', name: 'Gladiator Recruit', type: 'fighter', energy: ['M'], hp: 4, art: '🗡️',
+    { id: 'gladiator_recruit', name: 'Gladiator Recruit', type: 'fighter', energy: ['M'], hp: 8, art: '🗡️',
       attacks: [
-        { name: 'Jab', cost: ['M'], damage: 1 },
-        { name: 'Lunge', cost: ['M', 'M'], damage: 3 },
+        { name: 'Jab', cost: ['M'], damage: 2 },
+        { name: 'Lunge', cost: ['M', 'M'], damage: 6 },
       ],
       flavor: 'Fresh sand, fresh blood, fresh hope.' },
-    { id: 'arena_brawler', name: 'Arena Brawler', type: 'fighter', energy: ['M'], hp: 5, art: '👊',
+    { id: 'arena_brawler', name: 'Arena Brawler', type: 'fighter', energy: ['M'], hp: 10, art: '👊',
       attacks: [
-        { name: 'Haymaker', cost: ['M'], damage: 2 },
-        { name: 'Pile Driver', cost: ['M', 'M'], damage: 4, keywords: ['Brutal'] },
+        { name: 'Haymaker', cost: ['M'], damage: 4 },
+        { name: 'Pile Driver', cost: ['M', 'M'], damage: 8, keywords: ['Brutal'] },
       ],
       flavor: 'The crowd loves a knockout.' },
-    { id: 'iron_legionnaire', name: 'Iron Legionnaire', type: 'fighter', energy: ['M'], hp: 7, art: '🛡️',
+    { id: 'iron_legionnaire', name: 'Iron Legionnaire', type: 'fighter', energy: ['M'], hp: 14, art: '🛡️',
       keywords: ['Parry'],
       attacks: [
-        { name: 'Gladius Thrust', cost: ['M'], damage: 2 },
-        { name: 'Shield Bash', cost: ['M', 'T'], damage: 3, keywords: ['Counterattack'] },
+        { name: 'Gladius Thrust', cost: ['M'], damage: 4 },
+        { name: 'Shield Bash', cost: ['M', 'T'], damage: 6, keywords: ['Counterattack'] },
       ],
       flavor: 'Shield up. Step in. Strike.' },
-    { id: 'berserker', name: 'Berserker of Khar', type: 'fighter', energy: ['M'], hp: 6, art: '🪓',
+    { id: 'berserker', name: 'Berserker of Khar', type: 'fighter', energy: ['M'], hp: 12, art: '🪓',
       attacks: [
-        { name: 'Frenzied Axe', cost: ['M', 'M'], damage: 4 },
-        { name: 'Reckless Cleave', cost: ['M', 'M', 'M'], damage: 6, keywords: ['Brutal'] },
+        { name: 'Frenzied Axe', cost: ['M', 'M'], damage: 7 },
+        { name: 'Reckless Cleave', cost: ['M', 'M', 'M'], damage: 10, keywords: ['Brutal'] },
       ],
       flavor: 'Khar does not teach restraint.' },
-    { id: 'pit_hound', name: 'Pit Hound', type: 'fighter', energy: ['M'], hp: 4, art: '🐺',
+    { id: 'pit_hound', name: 'Pit Hound', type: 'fighter', energy: ['M'], hp: 8, art: '🐺',
       attacks: [
-        { name: 'Rabid Bite', cost: ['M'], damage: 1, keywords: ['Poison'] },
+        { name: 'Rabid Bite', cost: ['M'], damage: 2, keywords: ['Poison'] },
       ],
       flavor: 'Its bite festers long after the match.' },
-    { id: 'honour_guard', name: 'Honour Guard', type: 'fighter', energy: ['M'], hp: 6, art: '⚔️',
+    { id: 'honour_guard', name: 'Honour Guard', type: 'fighter', energy: ['M'], hp: 12, art: '⚔️',
       keywords: ['Honourable'],
       attacks: [
-        { name: "Guardian's Riposte", cost: ['M'], damage: 2, keywords: ['Intervention'] },
-        { name: 'Oathblade', cost: ['M', 'M'], damage: 3 },
+        { name: "Guardian's Riposte", cost: ['M'], damage: 4, keywords: ['Intervention'] },
+        { name: 'Oathblade', cost: ['M', 'M'], damage: 5 },
       ],
       flavor: 'Sworn to fall so others stand.' },
-    { id: 'veteran_pikeman', name: 'Veteran Pikeman', type: 'fighter', energy: ['M', 'T'], hp: 6, art: '🔱',
+    { id: 'veteran_pikeman', name: 'Veteran Pikeman', type: 'fighter', energy: ['M', 'T'], hp: 12, art: '🔱',
       keywords: ['Veteran'],
       attacks: [
-        { name: 'Pike Wall', cost: ['M'], damage: 2, keywords: ['Counterattack'] },
-        { name: 'Brace and Strike', cost: ['M', 'T'], damage: 3 },
+        { name: 'Pike Wall', cost: ['M'], damage: 4, keywords: ['Counterattack'] },
+        { name: 'Brace and Strike', cost: ['M', 'T'], damage: 6 },
       ],
       flavor: 'Retired twice. Unretired thrice.' },
 
     // ───────────── Arcane fighters ─────────────
-    { id: 'ember_acolyte', name: 'Ember Acolyte', type: 'fighter', energy: ['A'], hp: 4, art: '🔥',
+    { id: 'ember_acolyte', name: 'Ember Acolyte', type: 'fighter', energy: ['A'], hp: 10, art: '🔥',
       attacks: [
-        { name: 'Firebolt', cost: ['A'], damage: 1, keywords: ['Burn'] },
+        { name: 'Firebolt', cost: ['A'], damage: 2, keywords: ['Burn'] },
       ],
       abilities: [{ name: 'Meditate', cost: ['A'], effect: { type: 'token', token: 'A' } }],
       flavor: 'Every spark a prayer.' },
-    { id: 'hex_weaver', name: 'Hex Weaver', type: 'fighter', energy: ['A'], hp: 5, art: '🕸️',
+    { id: 'hex_weaver', name: 'Hex Weaver', type: 'fighter', energy: ['A'], hp: 12, art: '🕸️',
       attacks: [
-        { name: 'Shadow Lash', cost: ['A'], damage: 2 },
-        { name: 'Curse of Folly', cost: ['A', 'A'], damage: 2, keywords: ['Confuse'] },
+        { name: 'Shadow Lash', cost: ['A'], damage: 4 },
+        { name: 'Curse of Folly', cost: ['A', 'A'], damage: 4, keywords: ['Confuse'] },
       ],
       flavor: 'She tangles minds like thread.' },
-    { id: 'storm_elemental', name: 'Storm Elemental', type: 'fighter', energy: ['A', 'S'], hp: 7, art: '⚡',
+    { id: 'storm_elemental', name: 'Storm Elemental', type: 'fighter', energy: ['A', 'S'], hp: 14, art: '⚡',
       attacks: [
-        { name: 'Static Touch', cost: ['A'], damage: 2, keywords: ['Counterattack'] },
-        { name: 'Chain Lightning', cost: ['A', 'A', 'S'], salvo: 2 },
+        { name: 'Static Touch', cost: ['A'], damage: 4, keywords: ['Counterattack'] },
+        { name: 'Chain Lightning', cost: ['A', 'A', 'S'], salvo: 2, damage: 4 },
       ],
       flavor: 'Bottled in a lab. Unbottled in a rage.' },
-    { id: 'wyrmling', name: 'Wyrmling', type: 'fighter', energy: ['A'], hp: 6, art: '🐉',
+    { id: 'wyrmling', name: 'Wyrmling', type: 'fighter', energy: ['A'], hp: 12, art: '🐉',
       attacks: [
-        { name: 'Claw', cost: ['M'], damage: 2 },
-        { name: 'Flame Breath', cost: ['A', 'A'], damage: 3, keywords: ['Burn'] },
+        { name: 'Claw', cost: ['M'], damage: 4 },
+        { name: 'Flame Breath', cost: ['A', 'A'], damage: 6, keywords: ['Burn'] },
       ],
       flavor: 'Small for a dragon. Large for everything else.' },
-    { id: 'mirror_sprite', name: 'Mirror Sprite', type: 'fighter', energy: ['A'], hp: 3, art: '✨',
+    { id: 'mirror_sprite', name: 'Mirror Sprite', type: 'fighter', energy: ['A'], hp: 8, art: '✨',
       attacks: [
-        { name: 'Dazzle', cost: ['A'], damage: 1, keywords: ['Blinding', 'Long Ranged'] },
+        { name: 'Dazzle', cost: ['A'], damage: 2, keywords: ['Blinding', 'Long Ranged'] },
       ],
       flavor: 'Look closer. No — closer.' },
-    { id: 'runic_sentinel', name: 'Runic Sentinel', type: 'fighter', energy: ['A', 'M'], hp: 8, art: '🗿',
+    { id: 'runic_sentinel', name: 'Runic Sentinel', type: 'fighter', energy: ['A', 'M'], hp: 16, art: '🗿',
       keywords: ['Resonance'], faction: 'Vaultborne',
       attacks: [
-        { name: 'Rune Strike', cost: ['A', 'M'], damage: 3 },
+        { name: 'Rune Strike', cost: ['A', 'M'], damage: 6 },
       ],
       abilities: [{ name: 'Meditate', cost: ['A'], effect: { type: 'token', token: 'A' } }],
       flavor: 'The runes hum for those who stand beside it.' },
-    { id: 'spirit_wisp', name: 'Spirit Wisp', type: 'fighter', energy: ['A'], hp: 3, art: '👻',
+    { id: 'spirit_wisp', name: 'Spirit Wisp', type: 'fighter', energy: ['A'], hp: 8, art: '👻',
       keywords: ['Resonance'],
       attacks: [
-        { name: 'Ghost Touch', cost: ['A'], damage: 1, keywords: ['Long Ranged', 'Meditate'] },
+        { name: 'Ghost Touch', cost: ['A'], damage: 2, keywords: ['Long Ranged', 'Meditate'] },
       ],
       flavor: 'A flicker of something that refuses to leave.' },
 
     // ───────────── Tactical fighters ─────────────
-    { id: 'field_commander', name: 'Field Commander', type: 'fighter', energy: ['T'], hp: 5, art: '🎖️',
+    { id: 'field_commander', name: 'Field Commander', type: 'fighter', energy: ['T'], hp: 10, art: '🎖️',
       keywords: ['Embolden'],
       attacks: [
-        { name: 'Coordinated Strike', cost: ['T'], damage: 2 },
+        { name: 'Coordinated Strike', cost: ['T'], damage: 4 },
       ],
       abilities: [{ name: 'Strategize', cost: ['T'], effect: { type: 'token', token: 'T' } }],
       flavor: '"On my mark."' },
-    { id: 'crossbow_marksman', name: 'Crossbow Marksman', type: 'fighter', energy: ['T', 'M'], hp: 4, art: '🏹',
+    { id: 'crossbow_marksman', name: 'Crossbow Marksman', type: 'fighter', energy: ['T', 'M'], hp: 10, art: '🏹',
       attacks: [
-        { name: 'Bolt', cost: ['T'], damage: 0, keywords: ['Headshot', 'Long Ranged'] },
-        { name: 'Aimed Shot', cost: ['T', 'T'], damage: 2, keywords: ['Headshot', 'Long Ranged'] },
+        { name: 'Bolt', cost: ['T'], damage: 1, keywords: ['Headshot', 'Long Ranged'] },
+        { name: 'Aimed Shot', cost: ['T', 'T'], damage: 4, keywords: ['Headshot', 'Long Ranged'] },
       ],
       flavor: 'Never where you are looking.' },
-    { id: 'ambush_scout', name: 'Ambush Scout', type: 'fighter', energy: ['T'], hp: 4, art: '🥷',
+    { id: 'ambush_scout', name: 'Ambush Scout', type: 'fighter', energy: ['T'], hp: 10, art: '🥷',
       keywords: ['Veteran'], faction: 'Scellian SIB',
       attacks: [
-        { name: 'Knife Flurry', cost: ['T'], damage: 2 },
-        { name: 'Flank', cost: ['T', 'T'], damage: 3, keywords: ['Intervention'] },
+        { name: 'Knife Flurry', cost: ['T'], damage: 4 },
+        { name: 'Flank', cost: ['T', 'T'], damage: 6, keywords: ['Intervention'] },
       ],
       flavor: 'The Bureau sees everything. So does she.' },
-    { id: 'smoke_saboteur', name: 'Smoke Saboteur', type: 'fighter', energy: ['T'], hp: 4, art: '💨',
+    { id: 'smoke_saboteur', name: 'Smoke Saboteur', type: 'fighter', energy: ['T'], hp: 10, art: '💨',
       faction: 'Scellian SIB',
       attacks: [
-        { name: 'Blinding Powder', cost: ['T'], damage: 1, keywords: ['Blinding'] },
-        { name: 'Garrote', cost: ['T', 'M'], damage: 3 },
+        { name: 'Blinding Powder', cost: ['T'], damage: 2, keywords: ['Blinding'] },
+        { name: 'Garrote', cost: ['T', 'M'], damage: 6 },
       ],
       flavor: 'Now you see me—' },
-    { id: 'legion_tactician', name: 'Legion Tactician', type: 'fighter', energy: ['T'], hp: 5, art: '📜',
+    { id: 'legion_tactician', name: 'Legion Tactician', type: 'fighter', energy: ['T'], hp: 10, art: '📜',
       attacks: [
-        { name: 'Flanking Order', cost: ['T', 'T'], damage: 3, keywords: ['Intervention'] },
+        { name: 'Flanking Order', cost: ['T', 'T'], damage: 6, keywords: ['Intervention'] },
       ],
       abilities: [{ name: 'Strategize', cost: ['T'], effect: { type: 'token', token: 'T' } }],
       flavor: 'Wars are won on paper first.' },
-    { id: 'war_drummer', name: 'War Drummer', type: 'fighter', energy: ['T', 'M'], hp: 4, art: '🥁',
+    { id: 'war_drummer', name: 'War Drummer', type: 'fighter', energy: ['T', 'M'], hp: 8, art: '🥁',
       keywords: ['Embolden'],
       attacks: [
-        { name: 'Drumstick', cost: ['T'], damage: 1 },
-        { name: 'Battle Rhythm', cost: ['T', 'M'], damage: 2, keywords: ['Strategize'] },
+        { name: 'Drumstick', cost: ['T'], damage: 2 },
+        { name: 'Battle Rhythm', cost: ['T', 'M'], damage: 4, keywords: ['Strategize'] },
       ],
       flavor: 'Boom. Boom. Charge.' },
-    { id: 'siege_captain', name: 'Siege Captain', type: 'fighter', energy: ['T', 'S'], hp: 6, art: '💣',
+    { id: 'siege_captain', name: 'Siege Captain', type: 'fighter', energy: ['T', 'S'], hp: 12, art: '💣',
       keywords: ['Embolden'],
       attacks: [
-        { name: 'Bombard', cost: ['T', 'S', 'S'], salvo: 2, keywords: ['Long Ranged'] },
+        { name: 'Bombard', cost: ['T', 'S', 'S'], salvo: 2, damage: 4, keywords: ['Long Ranged'] },
       ],
       flavor: 'Walls are suggestions.' },
 
     // ───────────── Scientific fighters ─────────────
-    { id: 'clockwork_sentry', name: 'Clockwork Sentry', type: 'fighter', energy: ['S'], hp: 7, art: '⚙️',
-      armour: { M: 1 }, faction: 'Vaultborne',
+    { id: 'clockwork_sentry', name: 'Clockwork Sentry', type: 'fighter', energy: ['S'], hp: 14, art: '⚙️',
+      armour: { M: 2 }, faction: 'Vaultborne',
       attacks: [
-        { name: 'Rivet Gun', cost: ['S'], damage: 2 },
+        { name: 'Rivet Gun', cost: ['S'], damage: 4 },
       ],
       abilities: [{ name: 'Calibrate', cost: ['S'], effect: { type: 'token', token: 'S' } }],
       flavor: 'Tick. Tock. Target acquired.' },
-    { id: 'plasma_trooper', name: 'Plasma Trooper', type: 'fighter', energy: ['S'], hp: 5, art: '🔫',
+    { id: 'plasma_trooper', name: 'Plasma Trooper', type: 'fighter', energy: ['S'], hp: 10, art: '🔫',
       attacks: [
-        { name: 'Plasma Rifle', cost: ['S', 'S'], damage: 3, keywords: ['Burn'] },
-        { name: 'Overcharge', cost: ['S', 'S', 'S'], damage: 5, keywords: ['Brutal'] },
+        { name: 'Plasma Rifle', cost: ['S', 'S'], damage: 6, keywords: ['Burn'] },
+        { name: 'Overcharge', cost: ['S', 'S', 'S'], damage: 10, keywords: ['Brutal'] },
       ],
       flavor: 'Warranty void if fired.' },
-    { id: 'nanite_swarm', name: 'Nanite Swarm', type: 'fighter', energy: ['S'], hp: 4, art: '🦠',
+    { id: 'nanite_swarm', name: 'Nanite Swarm', type: 'fighter', energy: ['S'], hp: 10, art: '🦠',
       attacks: [
-        { name: 'Corrode', cost: ['S'], damage: 1, keywords: ['Poison', 'Long Ranged'] },
+        { name: 'Corrode', cost: ['S'], damage: 2, keywords: ['Poison', 'Long Ranged'] },
       ],
       flavor: 'Billions of tiny, hungry mouths.' },
-    { id: 'mech_walker', name: 'Mech Walker', type: 'fighter', energy: ['S', 'M'], hp: 9, art: '🤖',
+    { id: 'mech_walker', name: 'Mech Walker', type: 'fighter', energy: ['S', 'M'], hp: 18, art: '🤖',
       attacks: [
-        { name: 'Stomp', cost: ['M'], damage: 2, keywords: ['Counterattack'] },
-        { name: 'Autocannon', cost: ['S', 'S', 'M'], salvo: 2 },
+        { name: 'Stomp', cost: ['M'], damage: 4, keywords: ['Counterattack'] },
+        { name: 'Autocannon', cost: ['S', 'S', 'M'], salvo: 2, damage: 4 },
       ],
       flavor: 'Ten tonnes of bad intentions.' },
-    { id: 'drone_medic', name: 'Drone Medic', type: 'fighter', energy: ['S', 'T'], hp: 4, art: '🛸',
+    { id: 'drone_medic', name: 'Drone Medic', type: 'fighter', energy: ['S', 'T'], hp: 10, art: '🛸',
       keywords: ['Resonance'], faction: 'Scellian SIB',
       attacks: [
-        { name: 'Stun Laser', cost: ['S'], damage: 1, keywords: ['Confuse'] },
+        { name: 'Stun Laser', cost: ['S'], damage: 2, keywords: ['Confuse'] },
       ],
       abilities: [{ name: 'Calibrate', cost: ['S'], effect: { type: 'token', token: 'S' } }],
       flavor: 'Patches you up. Powers you up.' },
-    { id: 'tesla_engineer', name: 'Tesla Engineer', type: 'fighter', energy: ['S'], hp: 5, art: '🔌',
+    { id: 'tesla_engineer', name: 'Tesla Engineer', type: 'fighter', energy: ['S'], hp: 10, art: '🔌',
       attacks: [
-        { name: 'Zap', cost: ['S'], damage: 1, keywords: ['Calibrate'] },
-        { name: 'Arc Coil', cost: ['S', 'S'], damage: 3, keywords: ['Counterattack'] },
+        { name: 'Zap', cost: ['S'], damage: 2, keywords: ['Calibrate'] },
+        { name: 'Arc Coil', cost: ['S', 'S'], damage: 6, keywords: ['Counterattack'] },
       ],
       flavor: 'Touch the coil. I dare you.' },
-    { id: 'scrap_golem', name: 'Scrap Golem', type: 'fighter', energy: ['S', 'M'], hp: 8, art: '🦾',
-      armour: { S: 1 }, faction: 'Vaultborne',
+    { id: 'scrap_golem', name: 'Scrap Golem', type: 'fighter', energy: ['S', 'M'], hp: 16, art: '🦾',
+      armour: { S: 2 }, faction: 'Vaultborne',
       attacks: [
-        { name: 'Scrap Fist', cost: ['S', 'M'], damage: 3 },
+        { name: 'Scrap Fist', cost: ['S', 'M'], damage: 6 },
       ],
       flavor: 'Built from the losers of last season.' },
-    { id: 'sniper_drone', name: 'Sniper Drone', type: 'fighter', energy: ['S', 'T'], hp: 3, art: '🎯',
+    { id: 'sniper_drone', name: 'Sniper Drone', type: 'fighter', energy: ['S', 'T'], hp: 8, art: '🎯',
       attacks: [
-        { name: 'Rail Shot', cost: ['S', 'S'], damage: 1, keywords: ['Headshot', 'Long Ranged'] },
+        { name: 'Rail Shot', cost: ['S', 'S'], damage: 3, keywords: ['Headshot', 'Long Ranged'] },
       ],
       flavor: 'One click. One crater.' },
 
     // ───────────── Characters ─────────────
-    { id: 'valeria_pit', name: 'Valeria, Pit Fighter', baseName: 'Valeria', type: 'character', energy: ['M'], hp: 6, art: '🤺',
+    { id: 'valeria_pit', name: 'Valeria, Pit Fighter', baseName: 'Valeria', type: 'character', energy: ['M'], hp: 12, art: '🤺',
       keywords: ['Honourable'],
       attacks: [
-        { name: 'Taunting Strike', cost: ['M'], damage: 2, keywords: ['Counterattack'] },
-        { name: 'Twin Blades', cost: ['M', 'M'], damage: 3 },
+        { name: 'Taunting Strike', cost: ['M'], damage: 4, keywords: ['Counterattack'] },
+        { name: 'Twin Blades', cost: ['M', 'M'], damage: 6 },
       ],
       shift: { cost: ['M', 'M'] },
       flavor: 'Sold to the pits. Never broken by them.' },
-    { id: 'valeria_champion', name: 'Valeria, Champion of the Sands', baseName: 'Valeria', type: 'character', energy: ['M', 'T'], hp: 9, art: '🏆',
+    { id: 'valeria_champion', name: 'Valeria, Champion of the Sands', baseName: 'Valeria', type: 'character', energy: ['M', 'T'], hp: 18, art: '🏆',
       keywords: ['Honourable', 'Parry'],
       attacks: [
-        { name: 'Riposte', cost: ['M'], damage: 3, keywords: ['Counterattack'] },
-        { name: 'Sunfire Edge', cost: ['M', 'M', 'T'], damage: 5, keywords: ['Brutal'] },
+        { name: 'Riposte', cost: ['M'], damage: 6, keywords: ['Counterattack'] },
+        { name: 'Sunfire Edge', cost: ['M', 'M', 'T'], damage: 10, keywords: ['Brutal'] },
       ],
-      shift: { cost: [], condition: { type: 'favour', min: 3 } },
+      shift: { cost: [], cond: { k: 'favour', min: 3 }, ontoOnly: true },
       flavor: 'The crowd chants one name.' },
-    { id: 'orrin_hedge', name: 'Orrin, Hedge Mage', baseName: 'Orrin', type: 'character', energy: ['A'], hp: 5, art: '🧙',
+    { id: 'orrin_hedge', name: 'Orrin, Hedge Mage', baseName: 'Orrin', type: 'character', energy: ['A'], hp: 10, art: '🧙',
       attacks: [
-        { name: 'Arcane Missile', cost: ['A'], salvo: 1 },
+        { name: 'Arcane Missile', cost: ['A'], salvo: 1, damage: 1 },
       ],
       abilities: [{ name: 'Meditate', cost: ['A'], effect: { type: 'token', token: 'A' } }],
       shift: { cost: ['A'] },
       flavor: 'Self-taught. Mostly self-singed.' },
-    { id: 'orrin_archmage', name: 'Orrin, Archmage Ascendant', baseName: 'Orrin', type: 'character', energy: ['A', 'S'], hp: 8, art: '🌌',
+    { id: 'orrin_archmage', name: 'Orrin, Archmage Ascendant', baseName: 'Orrin', type: 'character', energy: ['A', 'S'], hp: 16, art: '🌌',
       keywords: ['Resonance'],
       attacks: [
-        { name: 'Mind Shatter', cost: ['A', 'A'], damage: 3, keywords: ['Confuse'] },
-        { name: 'Starfall', cost: ['A', 'A', 'A'], salvo: 3, keywords: ['Long Ranged'] },
+        { name: 'Mind Shatter', cost: ['A', 'A'], damage: 6, keywords: ['Confuse'] },
+        { name: 'Starfall', cost: ['A', 'A', 'A'], salvo: 3, damage: 3, keywords: ['Long Ranged'] },
       ],
       shift: { cost: ['A', 'A'], ontoOnly: true },
       flavor: 'The stars answer now.' },
-    { id: 'k7_salvage', name: 'K-7, Salvage Bot', baseName: 'K-7', type: 'character', energy: ['S'], hp: 6, art: '🔧',
+    { id: 'k7_salvage', name: 'K-7, Salvage Bot', baseName: 'K-7', type: 'character', energy: ['S'], hp: 12, art: '🔧',
       attacks: [
-        { name: 'Scrap Cannon', cost: ['S'], damage: 2 },
+        { name: 'Scrap Cannon', cost: ['S'], damage: 4 },
       ],
       abilities: [{ name: 'Calibrate', cost: ['S'], effect: { type: 'token', token: 'S' } }],
       shift: { cost: ['S'] },
       flavor: 'BEEP. SALVAGE PROTOCOL ENGAGED.' },
-    { id: 'k7_warframe', name: 'K-7, Warframe', baseName: 'K-7', type: 'character', energy: ['S', 'M'], hp: 10, art: '🦿',
-      armour: { M: 1 },
+    { id: 'k7_warframe', name: 'K-7, Warframe', baseName: 'K-7', type: 'character', energy: ['S', 'M'], hp: 20, art: '🦿',
+      armour: { M: 2 },
       attacks: [
-        { name: 'Crushing Fist', cost: ['M', 'S'], damage: 4, keywords: ['Brutal'] },
-        { name: 'Gatling Arm', cost: ['S', 'S', 'S'], salvo: 3 },
+        { name: 'Crushing Fist', cost: ['M', 'S'], damage: 8, keywords: ['Brutal'] },
+        { name: 'Gatling Arm', cost: ['S', 'S', 'S'], salvo: 3, damage: 3 },
       ],
-      shift: { cost: [], condition: { type: 'targetTokens', min: 2 }, ontoOnly: true },
+      shift: { cost: [], cond: { k: 'targetTokens', min: 2 }, ontoOnly: true },
       flavor: 'COMBAT PROTOCOL ENGAGED.' },
-    { id: 'hale_junior', name: 'Hale, Junior Inspector', baseName: 'Hale', type: 'character', energy: ['T'], hp: 5, art: '🕵️',
+    { id: 'hale_junior', name: 'Hale, Junior Inspector', baseName: 'Hale', type: 'character', energy: ['T'], hp: 10, art: '🕵️',
       keywords: ['Veteran'], faction: 'Scellian SIB',
       attacks: [
-        { name: 'Truncheon', cost: ['M'], damage: 2 },
+        { name: 'Truncheon', cost: ['M'], damage: 4 },
       ],
       abilities: [{ name: 'Deduce', cost: ['T'], effect: { type: 'token', token: 'T' } }],
       shift: { cost: ['T'] },
       flavor: 'First day on the multiverse beat.' },
-    { id: 'hale_chief', name: 'Hale, Chief Inspector', baseName: 'Hale', type: 'character', energy: ['T', 'S'], hp: 8, art: '🔎',
+    { id: 'hale_chief', name: 'Hale, Chief Inspector', baseName: 'Hale', type: 'character', energy: ['T', 'S'], hp: 16, art: '🔎',
       keywords: ['Embolden'], faction: 'Scellian SIB',
       attacks: [
-        { name: 'Service Revolver', cost: ['T'], damage: 1, keywords: ['Headshot'] },
-        { name: 'Cross-Examination', cost: ['T', 'T'], damage: 3, keywords: ['Confuse'] },
+        { name: 'Service Revolver', cost: ['T'], damage: 2, keywords: ['Headshot'] },
+        { name: 'Cross-Examination', cost: ['T', 'T'], damage: 6, keywords: ['Confuse'] },
       ],
       shift: { cost: ['T', 'T'], ontoOnly: true },
       flavor: '"The evidence is overwhelming."' },
-    { id: 'grimbold_warden', name: 'Grimbold, Vault Warden', baseName: 'Grimbold', type: 'character', energy: ['M', 'S'], hp: 7, art: '🔨',
+    { id: 'grimbold_warden', name: 'Grimbold, Vault Warden', baseName: 'Grimbold', type: 'character', energy: ['M', 'S'], hp: 14, art: '🔨',
       keywords: ['Parry'], faction: 'Vaultborne',
       attacks: [
-        { name: 'Bulwark Strike', cost: ['S'], damage: 2, keywords: ['Counterattack'] },
-        { name: 'Vault Hammer', cost: ['M', 'M'], damage: 4 },
+        { name: 'Bulwark Strike', cost: ['S'], damage: 4, keywords: ['Counterattack'] },
+        { name: 'Vault Hammer', cost: ['M', 'M'], damage: 8 },
       ],
       flavor: 'Nothing gets into the Vault. Nothing gets out.' },
-    { id: 'grimbold_unsealed', name: 'Grimbold, Unsealed', baseName: 'Grimbold', type: 'character', energy: ['M', 'A'], hp: 11, art: '🌋',
+    { id: 'grimbold_unsealed', name: 'Grimbold, Unsealed', baseName: 'Grimbold', type: 'character', energy: ['M', 'A'], hp: 22, art: '🌋',
       keywords: ['Honourable'], faction: 'Vaultborne',
       attacks: [
-        { name: 'Seismic Slam', cost: ['M', 'M'], salvo: 2 },
-        { name: 'Ancient Wrath', cost: ['M', 'A', 'A'], damage: 6, keywords: ['Brutal'] },
+        { name: 'Seismic Slam', cost: ['M', 'M'], salvo: 2, damage: 2 },
+        { name: 'Ancient Wrath', cost: ['M', 'A', 'A'], damage: 12, keywords: ['Brutal'] },
       ],
-      shift: { cost: [], condition: { type: 'targetDamage', min: 4 }, ontoOnly: true },
+      shift: { cost: [], cond: { k: 'targetDamage', min: 8 }, ontoOnly: true },
       flavor: 'Break the warden and the Vault breaks with him.' },
 
     // ───────────── Power Ups ─────────────
@@ -326,7 +326,7 @@
     { id: 'antidote', name: 'Antidote', type: 'powerup', art: '🧪', target: 'ownUnit',
       effect: { type: 'cleanse' }, flavor: 'Tastes awful. Works wonders.' },
     { id: 'field_dressing', name: 'Field Dressing', type: 'powerup', art: '🩹', target: 'ownUnit',
-      effect: { type: 'heal', n: 3 }, flavor: 'Walk it off.' },
+      effect: { type: 'heal', n: 6 }, flavor: 'Walk it off.' },
     { id: 'second_wind', name: 'Second Wind', type: 'powerup', art: '🌬️', target: 'none',
       effect: { type: 'draw', n: 2 }, flavor: 'Not done yet.' },
     { id: 'war_banner', name: 'War Banner', type: 'powerup', art: '🚩', target: 'ownUnit',
@@ -375,21 +375,51 @@
     Calibrate: 'Place 1 Scientific energy token on this unit.',
   };
 
+  Object.assign(KEYWORD_TEXT, {
+    Binding: 'After this attack resolves, roll a d6. On a 4+, the target becomes Bound.',
+    Voidborn: 'Gains 1 Void token for every 3 damage it takes and every 4 damage it deals.',
+    'Loyal Crew': 'When a Loyal Crew character Shifts, you may move a Loyal Crew fighter from your Support Zone into an empty Ready slot.',
+    Evidence: 'Evidence tokens are counters, not energy. Threshold Bureau cards spend them for their effects.',
+    Pressure: 'Pressure tokens build up on Sovereign and power his Shifts. They are counters, not energy.',
+    Void: 'Void tokens build up on Voidborn creatures until they cross their threshold and Shift. They are counters, not energy.',
+  });
+
   const STATUS_TEXT = {
     Poisoned: "Takes 1d3 Martial damage at the start of each of its controller's Arming phases.",
     Ablaze: "Takes 1d3 Arcane damage at the start of each of its controller's Arming phases.",
     Blinded: 'Its attacks deal no damage to their target.',
     Confused: 'Its attacks deal 1d3 Martial damage to itself instead of damaging their target.',
+    Bound: 'It cannot Retreat, move zones or react, and its attacks deal 2 less damage.',
   };
 
   const TOKEN_KEYWORDS = { Meditate: 'A', Sharpen: 'M', Strategize: 'T', Calibrate: 'S' };
+  const TOKEN_NAMES = { M: 'Martial', A: 'Arcane', T: 'Tactical', S: 'Scientific', E: 'Evidence', P: 'Pressure', V: 'Void' };
+  const MARK_TEXT = {
+    untargetable: 'cannot be targeted', taunt: 'must be targeted by enemy attacks', noReact: 'cannot react',
+    guard: 'is guarding its allies', undying: 'cannot be killed', weakened: 'deals half damage', noAttack: 'cannot attack',
+    ignoreShiftCond: 'may Shift without meeting its condition', canShiftNow: 'may Shift right now', bonusDie: '+1d6 to its attacks',
+    plusDamage: 'deals extra damage', unparryable: 'its attacks cannot be Parried', grantParry: 'has Parry',
+    interveneAny: 'may react with any attack', shiftOnKill: 'may Shift freely if it kills', regen: 'will regenerate',
+    freeAttack: 'attacks for free this turn',
+  };
 
+  // Deck sets (one file per faction) register here: public/js/sets/*.js
+  const SETS = typeof module === 'object' && module.exports
+    ? ['elementals', 'bureau', 'apex', 'octo', 'hollowing'].map(n => require('./sets/' + n + '.js'))
+    : ((typeof self !== 'undefined' ? self : this).BCSets || []);
+  for (const set of SETS) for (const c of set.cards) { c.set = set.id; c.faction = c.faction || set.faction; CARDS.push(c); }
+
+  const UNIT_KW_ON_ATTACKS = ['Parry', 'Embolden', 'Honourable', 'Veteran', 'Resonance'];
   const byId = {};
   for (const c of CARDS) {
     c.keywords = c.keywords || [];
     c.attacks = c.attacks || [];
     c.abilities = c.abilities || [];
-    for (const a of c.attacks) a.keywords = a.keywords || [];
+    for (const a of c.attacks) {
+      a.keywords = a.keywords || [];
+      // Unit keywords written on an attack line apply to the whole unit.
+      for (const k of UNIT_KW_ON_ATTACKS) if (a.keywords.includes(k)) { a.keywords = a.keywords.filter(x => x !== k); if (!c.keywords.includes(k)) c.keywords.push(k); }
+    }
     if (c.shift && !c.keywords.includes('Shift')) c.keywords.push('Shift');
     byId[c.id] = c;
   }
@@ -399,10 +429,41 @@
   }
 
   function damageText(atk) {
-    if (atk.salvo) return atk.salvo + 'd6';
-    let s = String(atk.damage || 0);
-    if (atk.keywords.includes('Headshot')) s = (atk.damage ? atk.damage + '+' : '') + 'd6';
-    return s;
+    let s = '';
+    const dice = (atk.salvo || 0) + (atk.keywords.includes('Headshot') ? 1 : 0);
+    if (dice) s = dice + 'd6' + (atk.damage ? '+' + atk.damage : '');
+    else s = String(atk.damage || 0);
+    if (atk.noDamage) s = '—';
+    return s + (atk.aoe ? ' all' : '');
+  }
+
+  function condText(c, card) {
+    if (!c) return '';
+    if (Array.isArray(c)) return c.map(x => condText(x, card)).join(' and ');
+    const b = card && card.baseName;
+    switch (c.k) {
+      case 'all': return c.of.map(x => condText(x, card)).join(' and ');
+      case 'any': return c.of.map(x => condText(x, card)).join(' or ');
+      case 'favour': return 'you have ' + c.min + '+ Favour';
+      case 'oppFavour': return 'your opponent has ' + c.min + '+ Favour';
+      case 'targetDamage': return b + ' has ' + c.min + '+ damage';
+      case 'targetTokens': return b + ' has ' + c.min + '+ ' + (c.token ? TOKEN_NAMES[c.token] + ' ' : '') + 'tokens';
+      case 'selfTokens': return 'it has ' + c.min + '+ ' + (c.token ? TOKEN_NAMES[c.token] + ' ' : '') + 'tokens';
+      case 'selfKills': return b + ' has killed ' + c.min + '+ opposing unit' + (c.min > 1 ? 's' : '');
+      case 'voidGained': return b + ' has gained ' + c.min + '+ Void tokens in total';
+      case 'hpAtMost': return 'it has ' + c.n + ' or less HP left';
+      case 'counter': return 'it has used ' + c.label + ' ' + c.min + '+ times';
+      case 'spent': return 'you have spent ' + c.min + '+ ' + TOKEN_NAMES[c.token] + ' tokens this game';
+      case 'pressure': return 'Sovereign has gained ' + c.min + '+ Pressure this game';
+      case 'enemyKills': return c.min + '+ opposing units have died this game';
+      case 'allyDeaths': return 'one of your units has died this game';
+      case 'stage': return 'Sovereign is at Stage ' + c.min + ' or higher';
+      case 'twoCharsActive': return 'you have two characters in your Active Zone';
+      case 'bothAttacked': return 'both your Active units attacked this turn';
+      case 'arenaTokens': return 'there are ' + c.min + '+ ' + TOKEN_NAMES[c.token] + ' tokens in the Arena';
+      case 'inArena': return c.base + ' is in your Arena';
+    }
+    return '';
   }
 
   function shiftText(card) {
@@ -410,18 +471,14 @@
     if (!s) return '';
     const parts = [];
     if (s.cost && s.cost.length) parts.push('pay ' + costText(s.cost));
-    if (s.condition) {
-      const c = s.condition;
-      if (c.type === 'favour') parts.push('you have ' + c.min + '+ Favour');
-      if (c.type === 'targetDamage') parts.push('the ' + card.baseName + ' it Shifts onto has ' + c.min + '+ damage');
-      if (c.type === 'targetTokens') parts.push('the ' + card.baseName + ' it Shifts onto has ' + c.min + '+ energy tokens');
-    }
-    let where = s.ontoOnly ? 'Shift onto ' + card.baseName + ' only' : 'Shift onto ' + card.baseName + ', or from Support into your Arena';
-    return where + (parts.length ? ' — ' + parts.join(', ') : ' — no cost') + '.';
+    if (s.cond) parts.push(condText(s.cond, card));
+    const where = s.ontoOnly ? 'Shift onto ' + card.baseName : 'Shift onto ' + card.baseName + ', or from Support into your Arena';
+    return where + (parts.length ? ' when ' + parts.join(' and ') : ' (no cost)') + '.';
   }
 
   function powerUpText(card) {
-    const e = card.effect;
+    if (card.text) return card.text;
+    const e = card.effect || {};
     switch (e.type) {
       case 'tokens': return 'Place ' + e.n + ' ' + TYPE_NAMES[e.token] + ' energy tokens on one of your units.';
       case 'cleanse': return 'Remove all statuses from one of your units.';
@@ -494,6 +551,8 @@
     },
   ];
 
+  for (const set of SETS) if (set.deck.length) PRESET_DECKS.push(Object.assign({ cards: expand(set.deck) }, set.info));
+
   /** Returns a list of problems with a decklist (array of card ids). Empty = legal. */
   function validateDeck(ids) {
     const problems = [];
@@ -506,6 +565,7 @@
     }
     for (const id in counts) {
       const c = byId[id];
+      if (c.flipSide) { problems.push(c.name + ' is the flip side of another card and cannot be put in a deck.'); continue; }
       const max = c.type === 'character' ? 1 : 2;
       if (counts[id] > max) problems.push(c.name + ': max ' + max + (max === 1 ? ' copy (character version).' : ' copies.'));
     }
@@ -513,6 +573,6 @@
     return problems;
   }
 
-  return { CARDS, byId, TYPE_NAMES, KEYWORD_TEXT, STATUS_TEXT, TOKEN_KEYWORDS, PRESET_DECKS,
-    validateDeck, costText, damageText, shiftText, powerUpText };
+  return { CARDS, byId, TYPE_NAMES, KEYWORD_TEXT, STATUS_TEXT, TOKEN_KEYWORDS, TOKEN_NAMES, MARK_TEXT, PRESET_DECKS, SETS,
+    validateDeck, costText, damageText, shiftText, powerUpText, condText };
 });
