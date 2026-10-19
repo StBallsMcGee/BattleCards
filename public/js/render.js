@@ -34,7 +34,7 @@
 
   /** Card art: the generated illustration, with the emoji as a fallback if the image is missing. */
   function art(d) {
-    return '<div class="c-art"><span class="c-emoji">' + d.art + '</span><img class="c-img" src="art/' + d.id + '.svg" alt="" loading="lazy" onerror="this.remove()"></div>';
+    return '<div class="c-art"><span class="c-emoji">' + d.art + '</span><img class="c-img" src="' + ((self.BCArt && self.BCArt[d.id]) || 'art/' + d.id + '.svg') + '" alt="" loading="lazy" onerror="this.remove()"></div>';
   }
 
   function attackHTML(a, i, opts) {

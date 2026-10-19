@@ -7,7 +7,10 @@
   "scripts": {
     "start": "node server.js",
     "test": "node --test tests/rules.test.js",
-    "simulate": "node tests/simulate.js 100"
+    "simulate": "node tests/simulate.js 100",
+    "build": "node tools/build.js"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  }
 }

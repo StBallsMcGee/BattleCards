@@ -2,6 +2,18 @@
 
 A browser client for **Battle Cards**, with a full rules engine, animated drag-and-drop play, an interactive tutorial, three bot opponents, a deck builder and online multiplayer.
 
+## Download & play
+
+| | How |
+|---|---|
+| **Quick play (offline)** | Download [`battle-cards.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.html) and double-click it. It's one self-contained file: tutorial, bots and deck builder, no install needed. |
+| **Full game (online play)** | Download [`battle-cards.zip`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.zip), unzip it and run **Start Battle Cards** for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Online play needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version. |
+| **In the browser** | https://stballsmcgee.github.io/battlecards/ (once GitHub Pages is switched on: *Settings → Pages → Source: GitHub Actions*). |
+
+Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). To publish a new release, push a version tag (`git tag v1.0.1 && git push origin v1.0.1`); the Release workflow tests and builds the game, then attaches both files. You can also build them yourself with `npm run build` (output in `dist/`).
+
+On Mac, the first time you open the `.command` file you may need to right-click it and choose **Open**, because it isn't from an identified developer.
+
 ## Running it
 
 **Offline (tutorial, bots, deck builder):** open `public/index.html` in a browser. You don't need to install anything.
@@ -45,6 +57,9 @@ public/js/deckbuilder.js, main.js, rules.js, sound.js
 tests/rules.test.js    32 rule-scenario tests
 tests/balance.js       deck-vs-deck balance report
 tools/gen-art.js       generates the card illustrations
+tools/build.js         builds dist/battle-cards.html (single file) and dist/battle-cards.zip
+launchers/             start scripts included in the zip
+.github/workflows/     Release (downloads) and Pages (play in browser) automation
 public/js/sets/        the five concept-doc deck sets
 public/art/            card illustrations (SVG)
 tests/simulate.js      bot-vs-bot simulator (crash testing + balance data)
