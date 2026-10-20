@@ -182,12 +182,17 @@
     if (!s || !T.active) { box.classList.add('hidden'); return; }
     const v = UI.view;
     if (s.when && (!v || !s.when(v))) { box.classList.add('hidden'); return; }
-    box.innerHTML = '<h4><span class="coach-mascot">🎓</span>' + s.title + '<span class="coach-step">' + (T.i + 1) + '/' + STEPS.length + '</span></h4>' + s.text +
+    const touch = UI.layout && UI.layout.touch;
+    // On a phone, "click" becomes "tap" and dragging is optional.
+    const text = touch ? s.text.replace(/\(click or drag them\)/g, '(tap them)').replace(/\bClick\b/g, 'Tap').replace(/\bclick\b/g, 'tap') : s.text;
+    box.innerHTML = '<h4><span class="coach-mascot">🎓</span>' + s.title + '<span class="coach-step">' + (T.i + 1) + '/' + STEPS.length + '</span></h4>' + text +
       '<div class="row">' + (s.last ? '' : '<button class="btn small subtle" data-skip>Skip tutorial</button>') + (s.next ? '<button class="btn gold small" data-next>' + (s.last ? 'Play on!' : 'Next →') + '</button>' : '') + '</div>';
     box.classList.remove('hidden');
     // Dock over the side columns so the Arena stays visible.
-    box.style.left = s.pos === 'right' ? '1262px' : '16px';
-    box.style.top = s.pos === 'right' ? '130px' : '146px';
+    if (!touch) { // the phone stylesheet docks the coach at the top of the screen
+      box.style.left = s.pos === 'right' ? '1262px' : '16px';
+      box.style.top = s.pos === 'right' ? '130px' : '146px';
+    }
     const nx = $('[data-next]', box);
     if (nx) nx.onclick = () => advance();
     const sk = $('[data-skip]', box);

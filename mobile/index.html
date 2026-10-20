@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Battle Cards</title>
+  <meta name="theme-color" content="#1a130d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Battle Cards">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <!-- The phone version shares the game, rules engine, bots and art with the desktop version in ../public -->
+  <link rel="stylesheet" href="../public/css/style.css">
+  <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+  <div id="rotate"><div><div class="rot-icon">📱↻</div><p>Turn your phone upright to play.</p></div></div>
+  <div id="viewport">
+    <div id="stage">
+
+      <!-- ───────── Main menu ───────── -->
+      <section id="screen-menu" class="screen active">
+        <div class="menu-hero">
+          <div class="menu-crest">⚔</div>
+          <h1>BATTLE CARDS</h1>
+          <h2>Gladiators of the Multiverse</h2>
+        </div>
+        <div class="menu-buttons">
+          <button class="btn big gold" data-go="tutorial">🎓 Tutorial</button>
+          <button class="btn big" data-go="play">🤖 Play vs Bot</button>
+          <button class="btn big" data-go="online">🌐 Play Online</button>
+          <button class="btn big" data-go="decks">🃏 Deck Builder</button>
+          <button class="btn big" data-go="rules">📖 Rules</button>
+          <button class="btn big subtle" data-go="settings">⚙ Settings</button>
+        </div>
+        <div class="menu-foot">A two-player card game · <a id="desktop-link" href="../public/index.html">desktop version</a></div>
+      </section>
+
+      <!-- ───────── Play vs bot setup ───────── -->
+      <section id="screen-play" class="screen">
+        <div class="panel-screen">
+          <header class="screen-head"><button class="btn subtle" data-go="menu">← Back</button><h2>Play vs Bot</h2></header>
+          <div class="cols">
+            <div class="col">
+              <h3>Your deck</h3>
+              <div id="play-my-decks" class="deck-list"></div>
+            </div>
+            <div class="col">
+              <h3>Opponent</h3>
+              <div id="play-bots" class="bot-list"></div>
+              <h3 style="margin-top:18px">Opponent's deck</h3>
+              <select id="play-bot-deck" class="select"></select>
+            </div>
+          </div>
+          <div class="screen-actions"><button id="play-start" class="btn big gold">Enter the Arena ⚔</button></div>
+        </div>
+      </section>
+
+      <!-- ───────── Online lobby ───────── -->
+      <section id="screen-online" class="screen">
+        <div class="panel-screen">
+          <header class="screen-head"><button class="btn subtle" data-go="menu">← Back</button><h2>Play Online</h2></header>
+          <div id="online-unavailable" class="notice hidden">
+            Online play needs the Battle Cards server. Start it with <code>node server.js</code> in the project folder,
+            then open <code>http://localhost:8080</code> (or your server's address) and share it with your opponent.
+          </div>
+          <div id="online-body" class="cols">
+            <div class="col">
+              <h3>Your name</h3>
+              <input id="online-name" class="input" maxlength="20" placeholder="Gladiator">
+              <h3 style="margin-top:18px">Your deck</h3>
+              <div id="online-decks" class="deck-list"></div>
+            </div>
+            <div class="col">
+              <h3>Create a match</h3>
+              <p class="muted">Create a room and send the code to your opponent.</p>
+              <button id="online-create" class="btn gold">Create Room</button>
+              <h3 style="margin-top:26px">Join a match</h3>
+              <div class="row"><input id="online-code" class="input code" maxlength="5" placeholder="CODE"><button id="online-join" class="btn">Join</button></div>
+              <div id="online-status" class="online-status"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ───────── Deck builder ───────── -->
+      <section id="screen-decks" class="screen">
+        <div class="builder">
+          <header class="screen-head"><button class="btn subtle" data-go="menu">← Back</button><h2>Deck Builder</h2>
+            <div class="filters">
+              <input id="db-search" class="input small" placeholder="Search cards…">
+              <select id="db-set" class="select small"><option value="">All sets</option><option value="core">Core set</option></select>
+              <select id="db-type" class="select small"><option value="">All types</option><option value="fighter">Fighters</option><option value="character">Characters</option><option value="powerup">Power Ups</option></select>
+              <select id="db-energy" class="select small"><option value="">All energy</option><option value="M">Martial</option><option value="A">Arcane</option><option value="T">Tactical</option><option value="S">Scientific</option></select>
+            </div>
+          </header>
+          <div class="builder-body">
+            <div id="db-collection" class="collection"></div>
+            <aside class="decklist">
+              <div class="row"><select id="db-load" class="select small grow"></select><button id="db-new" class="btn small">New</button></div>
+              <input id="db-name" class="input" placeholder="Deck name">
+              <div id="db-count" class="deck-count"></div>
+              <div id="db-curve" class="deck-curve"></div>
+              <div id="db-list" class="deck-cards"></div>
+              <div id="db-problems" class="problems"></div>
+              <div class="row wrap">
+                <button id="db-save" class="btn gold small">Save</button>
+                <button id="db-delete" class="btn small danger">Delete</button>
+                <button id="db-export" class="btn small">Export</button>
+                <button id="db-import" class="btn small">Import</button>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ───────── Rules ───────── -->
+      <section id="screen-rules" class="screen">
+        <div class="panel-screen wide">
+          <header class="screen-head"><button class="btn subtle" data-go="menu">← Back</button><h2>Rules Reference</h2></header>
+          <div id="rules-body" class="rules-body"></div>
+        </div>
+      </section>
+
+      <!-- ───────── Settings ───────── -->
+      <section id="screen-settings" class="screen">
+        <div class="panel-screen narrow">
+          <header class="screen-head"><button class="btn subtle" data-go="menu">← Back</button><h2>Settings</h2></header>
+          <label class="setting"><span>Your name</span><input id="set-name" class="input" maxlength="20"></label>
+          <label class="setting"><span>Animation speed</span>
+            <select id="set-speed" class="select"><option value="0.6">Slow</option><option value="1">Normal</option><option value="1.8">Fast</option><option value="4">Very fast</option></select></label>
+          <label class="setting"><span>Choose energy payments manually</span><input id="set-manualpay" type="checkbox"></label>
+          <label class="setting"><span>Ask before spending tokens on rolls</span><input id="set-askroll" type="checkbox" checked></label>
+          <label class="setting"><span>Sound effects</span><input id="set-sound" type="checkbox" checked></label>
+        </div>
+      </section>
+
+      <!-- ───────── Game board ───────── -->
+      <section id="screen-game" class="screen game">
+        <div id="board"></div>
+      </section>
+
+      <div id="toast-layer"></div>
+      <div id="modal-layer"></div>
+    </div>
+  </div>
+
+  <script src="js/layout.js"></script>
+  <script src="../public/js/sets/elementals.js"></script>
+  <script src="../public/js/sets/bureau.js"></script>
+  <script src="../public/js/sets/apex.js"></script>
+  <script src="../public/js/sets/octo.js"></script>
+  <script src="../public/js/sets/hollowing.js"></script>
+  <script src="../public/js/cards.js"></script>
+  <script src="../public/js/engine.js"></script>
+  <script src="../public/js/bots.js"></script>
+  <script src="../public/js/render.js"></script>
+  <script src="../public/js/sound.js"></script>
+  <script src="../public/js/ui.js"></script>
+  <script src="../public/js/controllers.js"></script>
+  <script src="../public/js/tutorial.js"></script>
+  <script src="../public/js/deckbuilder.js"></script>
+  <script src="../public/js/rules.js"></script>
+  <script src="../public/js/main.js"></script>
+  <script src="js/mobile.js"></script>
+</body>
+</html>

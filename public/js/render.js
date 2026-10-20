@@ -33,7 +33,8 @@
   }
 
   /** Card art: the generated illustration, with the emoji as a fallback if the image is missing. */
-  function artUrl(d) { return (self.BCArt && self.BCArt[d.id]) || 'art/' + d.id + '.svg'; }
+  // BCArt: inlined images (single-file builds). BCArtBase: where the art folder is, relative to the page.
+  function artUrl(d) { return (self.BCArt && self.BCArt[d.id]) || (self.BCArtBase || 'art/') + d.id + '.svg'; }
   function art(d) {
     return '<div class="c-art"><span class="c-emoji">' + d.art + '</span><img class="c-img" src="' + artUrl(d) + '" alt="" loading="lazy" onerror="this.remove()"></div>';
   }

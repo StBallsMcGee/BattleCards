@@ -9,10 +9,28 @@ A browser client for **Battle Cards**, with a full rules engine, animated drag-a
 | **Quick play (offline)** | Download [`battle-cards.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.html) and double-click it. It's one self-contained file: tutorial, bots and deck builder, no install needed. |
 | **Full game (online play)** | Download [`battle-cards.zip`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.zip), unzip it and run **Start Battle Cards** for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Online play needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version. |
 | **In the browser** | https://stballsmcgee.github.io/battlecards/ (once GitHub Pages is switched on: *Settings → Pages → Source: GitHub Actions*). |
+| **On a phone** | https://stballsmcgee.github.io/battlecards/mobile/ (see [Playing on a phone](#playing-on-a-phone)), or download [`battle-cards-mobile.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards-mobile.html). |
 
 Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). Every push to `main` runs the Release workflow, which tests and builds the game and attaches both files to the release for the version in `package.json`. To start a new release, bump `version` in `package.json`. You can also build them yourself with `npm run build` (output in `dist/`).
 
 On Mac, the first time you open the `.command` file you may need to right-click it and choose **Open**, because it isn't from an identified developer.
+
+## Playing on a phone
+
+The `mobile/` folder is a second version of the game laid out for phones held upright. It is the same game: it loads the rules engine, bots, tutorial, decks and card art from `public/`, so a rules or card change applies to both versions.
+
+- **Layout:** your opponent is at the top and you are at the bottom, with your hand along the bottom edge and a big button for ending phases.
+  - The game log is behind the 📜 button.
+  - The Support Zones are strips you can swipe sideways.
+- **Touch:** tap a card to see it full-size together with what you can do with it. Tap an opponent's card to read it. Dragging works too, and the card stays above your finger.
+- **Install it:**
+  1. Open `…/mobile/` on GitHub Pages, or on your own server (see below).
+  2. Choose **Add to Home Screen** (Safari's share menu on iPhone, Chrome's ⋮ menu on Android).
+  3. The game then opens full-screen like an app and works offline: it caches every file and card image the first time it loads.
+- **Online play** from a phone works when the server is running: open `http://<server>:8080/mobile/`. Phone and desktop players can play each other.
+- **Desktop link:** the desktop menu links to the phone version, and shows a big button when it's opened on a phone.
+
+How it works: `public/js/ui.js` takes its board positions from a layout object. The desktop layout is the default, and `mobile/js/layout.js` replaces it with a portrait 720×1440 board and turns on touch behaviour. `mobile/css/mobile.css` restyles the menus and panels for a narrow screen.
 
 ## Running it
 
@@ -57,10 +75,13 @@ public/js/deckbuilder.js, main.js, rules.js, sound.js
 tests/rules.test.js    32 rule-scenario tests
 tests/balance.js       deck-vs-deck balance report
 tools/gen-art.js       generates the card illustrations
-tools/build.js         builds dist/battle-cards.html (single file) and dist/battle-cards.zip
+tools/build.js         builds dist/battle-cards.html and battle-cards-mobile.html (single files) and dist/battle-cards.zip
 launchers/             start scripts included in the zip
 .github/workflows/     Release (downloads) and Pages (play in browser) automation
 public/js/sets/        the five concept-doc deck sets
+mobile/                phone version: index.html, css/mobile.css, js/layout.js (portrait board),
+                       sw.js + manifest.webmanifest (install & offline), icons/
+tools/gen-icons.js     renders the app icons from mobile/icons/icon.svg
 public/art/            card illustrations (SVG)
 tests/simulate.js      bot-vs-bot simulator (crash testing + balance data)
 ```

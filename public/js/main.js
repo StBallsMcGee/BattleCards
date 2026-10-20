@@ -137,5 +137,13 @@
   bindSettings();
   window.BCDeckBuilder.bind();
 
+  // Link to the phone version (mobile/ next to this page; ../mobile/ in a checked-out copy). Phones get a big button.
+  if (!UI.layout.touch && !window.BCArt) {
+    const href = location.protocol === 'file:' ? '../mobile/index.html' : 'mobile/';
+    $('.menu-foot').insertAdjacentHTML('beforeend', ' · <a class="phone-link" href="' + href + '">📱 phone version</a>');
+    const phone = window.matchMedia && matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 700;
+    if (phone) $('.menu-buttons').insertAdjacentHTML('beforebegin', '<a class="btn big gold phone-cta" href="' + href + '">📱 Switch to the phone version</a>');
+  }
+
   window.BCMain = { go, showRulesModal, state };
 })();

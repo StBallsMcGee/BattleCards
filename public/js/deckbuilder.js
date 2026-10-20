@@ -98,7 +98,7 @@
       const c = C.byId[id];
       return '<div class="dl-row" data-id="' + id + '" data-card-id="' + id + '" title="Click to remove"><span class="n">' + n[id] + '×</span><span>' + c.art + '</span><span class="nm">' + R.esc(c.name) + '</span>' +
         (c.energy ? R.pips(c.energy) : '<small class="muted">Power Up</small>') + '</div>';
-    }).join('') || '<p class="muted">Click cards on the left to add them.</p>';
+    }).join('') || '<p class="muted">' + (window.BCUI && window.BCUI.layout.touch ? 'Tap cards above to add them.' : 'Click cards on the left to add them.') + '</p>';
     $$('.dl-row').forEach(el => el.onclick = () => removeOne(el.dataset.id));
     const total = B.deck.cards.length;
     const units = B.deck.cards.filter(id => C.byId[id].type !== 'powerup').length;

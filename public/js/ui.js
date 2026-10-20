@@ -13,10 +13,23 @@
   const def = c => C.byId[c.id];
   const esc = R.esc;
 
-  // Layout constants (stage is 1600 × 900).
-  const CX = 790;
-  const ACTIVE_X = [CX - 100, CX + 100], READY_X = [CX - 200, CX, CX + 200];
-  const AW = 136, AH = 190, RW = 92, RH = 130, HW = 150;
+  // Board layout. The desktop layout is the default; another page (the phone version) can
+  // set window.BCLayout before this script loads to override any of these.
+  const L = Object.assign({
+    W: 1600, H: 900,                      // stage size
+    CX: 790, CY: 412,                     // centre of the arena (banners, prompts, effects)
+    AW: 136, AH: 190, RW: 92, RH: 130,    // Active / Ready card sizes
+    activeDX: 100, readyDX: 200,          // horizontal spacing of the slots from CX
+    rows: { oppReady: 34, oppActive: 178, meActive: 446, meReady: 650 },
+    HW: 150,                              // hand card width
+    hand: { y: 778, curve: 1.4, rot: 2.6, maxSpread: 140, span: 820, oppY: -66 },
+    menu: { minX: 340, maxX: 1250 },      // where the action menu may sit
+    previewW: 270,
+    touch: false,                         // phone mode: tap to inspect, no hover
+  }, window.BCLayout || {});
+  const CX = L.CX;
+  const ACTIVE_X = [CX - L.activeDX, CX + L.activeDX], READY_X = [CX - L.readyDX, CX, CX + L.readyDX];
+  const AW = L.AW, AH = L.AH, RW = L.RW, RH = L.RH, HW = L.HW;
 
   const WAIT = {
     roll: 950, damage: 520, attack: 420, favour: 1000, defeated: 650, die: 350, turn: 1100, phase: 280, status: 650,
@@ -49,11 +62,11 @@
   // ───────────────────────── stage scaling ─────────────────────────
   function fit() {
     const st = $('#stage');
-    const s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    const s = Math.min(window.innerWidth / L.W, window.innerHeight / L.H);
     UI.scale = s;
     st.style.transform = 'scale(' + s + ')';
-    st.style.left = Math.max(0, (window.innerWidth - 1600 * s) / 2) + 'px';
-    st.style.top = Math.max(0, (window.innerHeight - 900 * s) / 2) + 'px';
+    st.style.left = Math.max(0, (window.innerWidth - L.W * s) / 2) + 'px';
+    st.style.top = Math.max(0, (window.innerHeight - L.H * s) / 2) + 'px';
   }
   window.addEventListener('resize', fit);
   fit();
@@ -110,14 +123,14 @@
       '<div id="opp-hand" class="hand opp"></div>' +
       '<div id="opp-info" class="pinfo opp"></div>' +
       '<div id="opp-support" class="support opp"><div class="zlabel">Opponent Support</div><div class="stiles"></div></div>' +
-      slots('opp', 'ready', READY_X, RW, RH, 34) + slots('opp', 'active', ACTIVE_X, AW, AH, 178) +
+      slots('opp', 'ready', READY_X, RW, RH, L.rows.oppReady) + slots('opp', 'active', ACTIVE_X, AW, AH, L.rows.oppActive) +
       '<div id="center-band"></div>' +
-      slots('me', 'active', ACTIVE_X, AW, AH, 446) + slots('me', 'ready', READY_X, RW, RH, 650) +
+      slots('me', 'active', ACTIVE_X, AW, AH, L.rows.meActive) + slots('me', 'ready', READY_X, RW, RH, L.rows.meReady) +
       '<div id="me-support" class="support me"><div class="zlabel">Your Support Zone <span class="hint">— energy</span></div><div class="stiles"></div></div>' +
       '<div id="me-info" class="pinfo me"></div>' +
       '<div id="me-hand" class="hand me"></div>' +
       '<div id="side"><div id="phase-tracker"></div><div id="log"></div><div id="side-actions"><button id="main-btn" class="btn big gold">…</button></div></div>' +
-      '<svg id="arrows" width="1600" height="900"><defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs></svg>' +
+      '<svg id="arrows" width="' + L.W + '" height="' + L.H + '"><defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="currentColor"/></marker></defs></svg>' +
       '<div id="fx-layer"></div><div id="prompt" class="hidden"></div><div id="popmenu" class="hidden"></div>' +
       '<div id="preview" class="hidden"></div>' +
       '<button id="btn-menu" class="btn subtle small" title="Menu">☰</button>' +
@@ -129,8 +142,9 @@
     const board = $('#board');
     board.addEventListener('pointerdown', onPointerDown);
     board.addEventListener('pointerover', onHover);
-    board.addEventListener('pointerout', e => { if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest('[data-card-id]')) hidePreview(); });
+    board.addEventListener('pointerout', e => { if (L.touch) return; if (!e.relatedTarget || !e.relatedTarget.closest || !e.relatedTarget.closest('[data-card-id]')) hidePreview(); });
     board.addEventListener('contextmenu', e => { e.preventDefault(); cancelSelection(); });
+    if (L.afterBuild) L.afterBuild(UI);
   }
 
   // ───────────────────────── rendering ─────────────────────────
@@ -227,12 +241,12 @@
     if (mine && UI.setup) cards = cards.filter(c => !UI.setup.some(x => x.uid === c.uid));
     const n = cards.length;
     const w = mine ? HW : 70;
-    const spread = mine ? Math.min(140, 820 / Math.max(1, n)) : Math.min(46, 400 / Math.max(1, n));
+    const spread = mine ? Math.min(L.hand.maxSpread, (L.hand.span - (L.touch ? w : 0)) / Math.max(1, L.touch ? n - 1 : n)) : Math.min(46, 400 / Math.max(1, n));
     box.innerHTML = cards.map((c, i) => {
       const off = i - (n - 1) / 2;
       const x = CX + off * spread - w / 2;
-      const rot = off * (mine ? 2.6 : -2.6);
-      const y = mine ? 778 + Math.abs(off) * Math.abs(off) * 1.4 : -66 - Math.abs(off) * Math.abs(off) * 1.2;
+      const rot = off * (mine ? L.hand.rot : -2.6);
+      const y = mine ? L.hand.y + Math.abs(off) * Math.abs(off) * L.hand.curve : L.hand.oppY - Math.abs(off) * Math.abs(off) * 1.2;
       const inner = mine && !c.hidden ? R.card(c.id, { uid: c.uid, w: HW, cls: 'in-hand' }) : R.back({ uid: c.uid, w: 70 });
       // The outer box keeps its place while the inner card lifts on hover, so the card never slides out from under the pointer.
       return '<div class="hand-card" data-flip="' + c.uid + '" data-hand-uid="' + c.uid + '"' + (mine && !c.hidden ? ' data-card-id="' + c.id + '"' : '') +
@@ -324,6 +338,7 @@
         }
         if (!from) { el.animate([{ opacity: 0, transform: 'scale(0.85)' }, { opacity: 1, transform: 'none' }], { duration: dur, easing: 'ease-out' }); return; }
       }
+      if (!now.w || !from.w) return; // hidden (e.g. the opponent's hand on a phone)
       const dx = from.cx - now.cx, dy = from.cy - now.cy;
       if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
       const sc = from.w / now.w;
@@ -472,6 +487,7 @@
     const t = e.target;
     if (t.closest('#popmenu')) return; // let the menu item's click handler run
     hidePopMenu();
+    if (L.touch) hidePreview();
     // Target selection mode
     if (UI.sel) {
       const hit = UI.sel.targets.find(x => x.el && (x.el === t || x.el.contains(t)));
@@ -486,21 +502,48 @@
     if (pile) { showGrave(pile.dataset.owner === 'me' ? UI.me : 1 - UI.me); return; }
 
     if (UI.setup) { setupPointerDown(e); return; }
-    if (!isMyMain()) return;
 
     const handEl = t.closest('#me-hand .hand-card');
     const myUnit = t.closest('.slot[data-owner="me"] .card');
     const mySup = t.closest('#me-support .stile');
     let opts = null, anchor = null;
-    if (handEl) { opts = handOptions(handEl.dataset.handUid); anchor = handEl; }
-    else if (myUnit) { opts = unitOptions(myUnit.dataset.uid); anchor = myUnit; }
-    else if (mySup) { opts = supportOptions(mySup.dataset.uid); anchor = mySup; }
-    if (!opts) return;
+    if (isMyMain()) {
+      if (handEl) { opts = handOptions(handEl.dataset.handUid); anchor = handEl; }
+      else if (myUnit) { opts = unitOptions(myUnit.dataset.uid); anchor = myUnit; }
+      else if (mySup) { opts = supportOptions(mySup.dataset.uid); anchor = mySup; }
+    }
+    if (!opts) {
+      // Phone: with no hover, tapping any card (yours or your opponent's) shows it enlarged.
+      const cardEl = L.touch && t.closest('[data-card-id]');
+      if (cardEl) tapToInspect(e, cardEl);
+      return;
+    }
     e.preventDefault();
     const start = stagePoint(e);
     drag = { start, anchor, opts, moved: false, ghost: null, pointerId: e.pointerId };
     window.addEventListener('pointermove', onPointerMove);
     window.addEventListener('pointerup', onPointerUp, { once: true });
+    window.addEventListener('pointercancel', onPointerCancel, { once: true });
+  }
+  function onPointerCancel() {
+    window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointerup', onPointerUp);
+    if (drag && drag.ghost) { drag.ghost.remove(); drag.anchor.classList.remove('dragging'); }
+    $$('.drop-ok').forEach(x => x.classList.remove('drop-ok', 'drop-hover'));
+    drag = null;
+  }
+  function tapToInspect(e, el) {
+    const start = stagePoint(e);
+    window.addEventListener('pointerup', ev => {
+      const p = stagePoint(ev);
+      if (Math.hypot(p.x - start.x, p.y - start.y) < 14) showCardPreview(el);
+    }, { once: true });
+  }
+  function showCardPreview(el) {
+    const host = el.dataset.cardId ? el : el.querySelector('[data-card-id]');
+    if (!host) return;
+    const uid = host.dataset.uid;
+    showPreview(host.dataset.cardId, uid && UI.view ? E.unitByUid(UI.view, uid) : null, stageRect(el), false);
   }
 
   function dropTargets(opts) {
@@ -531,7 +574,7 @@
     }
     if (drag.moved) {
       drag.ghost.style.left = (p.x - 60) + 'px';
-      drag.ghost.style.top = (p.y - 80) + 'px';
+      drag.ghost.style.top = (p.y - (L.touch ? 260 : 80)) + 'px'; // on a phone, keep the card above the finger
       for (const t of drag.targets) t.el.classList.toggle('drop-hover', inside(t.el, p));
     }
   }
@@ -539,6 +582,7 @@
 
   function onPointerUp(e) {
     window.removeEventListener('pointermove', onPointerMove);
+    window.removeEventListener('pointercancel', onPointerCancel);
     const d = drag;
     drag = null;
     if (!d) return;
@@ -552,6 +596,10 @@
       return;
     }
     showPopMenu(d.anchor, d.opts);
+    if (L.touch) { // phone: show the card itself alongside its actions
+      if (d.opts.length) d.anchor.classList.add('picked');
+      showCardPreview(d.anchor);
+    }
   }
 
   function showPopMenu(anchor, opts) {
@@ -572,8 +620,12 @@
     const mh = m.offsetHeight, mw = m.offsetWidth;
     let x = r.cx - mw / 2, y = r.y - mh - 8;
     if (y < 10) y = r.y + r.h + 8;
-    x = Math.max(340, Math.min(1250 - mw, x));
-    y = Math.max(8, Math.min(890 - mh, y));
+    x = Math.max(L.menu.minX, Math.min(L.menu.maxX - mw, x));
+    y = Math.max(8, Math.min(L.H - 10 - mh, y));
+    if (L.touch) { // phone: the menu sits in the middle of the board, the card preview above or below it
+      x = (L.W - mw) / 2;
+      y = Math.max(8, Math.min(L.H - 10 - mh, L.CY - mh / 2));
+    }
     m.style.left = x + 'px';
     m.style.top = y + 'px';
     $$('.pm-item', m).forEach(b => b.addEventListener('click', () => {
@@ -583,7 +635,11 @@
       chooseOption(o);
     }));
   }
-  function hidePopMenu() { UI.menuOpen = false; if ($('#popmenu')) $('#popmenu').classList.add('hidden'); }
+  function hidePopMenu() {
+    UI.menuOpen = false;
+    if ($('#popmenu')) $('#popmenu').classList.add('hidden');
+    $$('.picked').forEach(x => x.classList.remove('picked'));
+  }
 
   function chooseOption(o) {
     if (o.action) return commit(o.action, o);
@@ -595,7 +651,7 @@
   function startSelection(o) {
     UI.sel = { opt: o, targets: o.targets.filter(t => t.el) };
     for (const t of UI.sel.targets) t.el.classList.add('targetable');
-    coachHint('Choose a target — right-click or click elsewhere to cancel.');
+    coachHint(L.touch ? 'Tap a target — tap anywhere else to cancel.' : 'Choose a target — right-click or click elsewhere to cancel.');
   }
   function cancelSelection() {
     if (!UI.sel) return;
@@ -721,7 +777,7 @@
 
   // ───────────────────────── hover preview ─────────────────────────
   function onHover(e) {
-    if ((drag && drag.moved) || UI.menuOpen) return;
+    if (L.touch || (drag && drag.moved) || UI.menuOpen) return;
     const el = e.target.closest && e.target.closest('[data-card-id]');
     if (!el) return;
     const id = el.dataset.cardId;
@@ -732,8 +788,13 @@
   }
   function showPreview(id, unit, r, side) {
     const pv = $('#preview');
-    pv.innerHTML = R.card(id, { w: 270, unit }) + '<div class="explain">' + R.explain(id, unit) + '</div>';
+    pv.innerHTML = R.card(id, { w: L.previewW, unit }) + '<div class="explain">' + R.explain(id, unit) + '</div>';
     pv.classList.remove('hidden');
+    if (L.touch) { // phone: full-width panel in whichever half of the board the card is not in
+      pv.style.left = '8px';
+      pv.style.top = (r.cy > L.H / 2 ? 8 : L.H / 2 + 50) + 'px';
+      return;
+    }
     if (side) { pv.style.left = '1290px'; pv.style.top = '20px'; return; }
     const left = r.cx < 800 ? Math.min(1300, r.x + r.w + 16) : Math.max(10, r.x - 290);
     pv.style.left = Math.max(10, Math.min(1320, left)) + 'px';
@@ -917,8 +978,8 @@
   function beginSetup(view) {
     if (!UI.setup) UI.setup = [];
     render(view);
-    const p = showPrompt('<h3>Place your gladiators</h3><p>Click units in your hand (or drag them) to place 1–4 of them into your Active and Ready slots. ' +
-      'Your opponent can\'t see your placement until both of you are ready. Click a placed unit to take it back.</p>' +
+    const p = showPrompt('<h3>Place your gladiators</h3><p>' + (L.touch ? 'Tap' : 'Click') + ' units in your hand (or drag them) to place 1–4 of them into your Active and Ready slots. ' +
+      'Your opponent can\'t see your placement until both of you are ready. ' + (L.touch ? 'Tap' : 'Click') + ' a placed unit to take it back.</p>' +
       '<div class="row"><button class="btn gold" data-ok>Ready! ⚔</button><button class="btn" data-auto>Auto-place</button></div>', 'setup');
     const upd = () => { $('[data-ok]', p).textContent = 'Ready! (' + UI.setup.length + ' placed)'; $('[data-ok]', p).disabled = !UI.setup.length; };
     upd();
@@ -975,7 +1036,7 @@
         $('#fx-layer').appendChild(ghost);
         targets.forEach(x => x.el.classList.add('drop-ok'));
       }
-      if (ghost) { ghost.style.left = (p.x - 60) + 'px'; ghost.style.top = (p.y - 80) + 'px'; targets.forEach(x => x.el.classList.toggle('drop-hover', inside(x.el, p))); }
+      if (ghost) { ghost.style.left = (p.x - 60) + 'px'; ghost.style.top = (p.y - (L.touch ? 260 : 80)) + 'px'; targets.forEach(x => x.el.classList.toggle('drop-hover', inside(x.el, p))); }
     };
     window.addEventListener('pointermove', move);
     window.addEventListener('pointerup', ev => {
@@ -995,7 +1056,7 @@
 
   // ───────────────────────── effects ─────────────────────────
   function fxAt(el, html, cls, dur) {
-    const r = el ? stageRect(el) : { cx: CX, cy: 412 };
+    const r = el ? stageRect(el) : { cx: CX, cy: L.CY };
     const f = document.createElement('div');
     f.className = 'fx ' + (cls || '');
     f.innerHTML = html;
@@ -1094,7 +1155,7 @@
         S.play('play');
         if (ev.player !== UI.me) {
           const f = fxAt(null, R.card(ev.cardId, { w: 220 }), 'powerup-show', 1300);
-          f.style.top = '250px';
+          f.style.top = (L.CY - 162) + 'px';
         }
         break;
       }
@@ -1187,5 +1248,6 @@
   UI.isIdle = () => !UI.busy && UI.queue.length === 0;
   UI.stageRect = stageRect;
 
+  UI.layout = L;
   window.BCUI = UI;
 })();

@@ -19,9 +19,10 @@ const E = require('./public/js/engine.js');
 
 const PORT = +process.env.PORT || 8080;
 const PUBLIC = path.join(__dirname, 'public');
+const MOBILE = path.join(__dirname, 'mobile'); // phone version, served at /mobile/
 const ROOM_TTL = 3 * 60 * 60 * 1000;
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
-  '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json' };
+  '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json', '.webmanifest': 'application/manifest+json' };
 
 /** rooms: code -> { code, players: [{ name, deck, token, streams: Set }], game, touched } */
 const rooms = new Map();
@@ -158,9 +159,14 @@ async function api(req, res, url) {
 
 function serveStatic(req, res, url) {
   let p = decodeURIComponent(url.pathname);
-  if (p === '/') p = '/index.html';
-  const file = path.normalize(path.join(PUBLIC, p));
-  if (!file.startsWith(PUBLIC)) { res.writeHead(403); return res.end(); }
+  // /mobile/… is the phone version; it loads the shared game files from /public/…, which is the same as /…
+  let root = PUBLIC;
+  if (p === '/mobile') { res.writeHead(301, { Location: '/mobile/' }); return res.end(); }
+  if (p.startsWith('/mobile/')) { root = MOBILE; p = p.slice('/mobile'.length); }
+  else if (p.startsWith('/public/')) p = p.slice('/public'.length);
+  if (p.endsWith('/')) p += 'index.html';
+  const file = path.normalize(path.join(root, p));
+  if (!file.startsWith(root)) { res.writeHead(403); return res.end(); }
   fs.readFile(file, (err, data) => {
     if (err) { res.writeHead(404); return res.end('Not found'); }
     res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream' });
@@ -170,6 +176,7 @@ function serveStatic(req, res, url) {
 
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://localhost');
+  if (url.pathname.startsWith('/mobile/api/')) url.pathname = url.pathname.slice('/mobile'.length); // the phone page calls api/ relative to /mobile/
   if (url.pathname.startsWith('/api/')) {
     api(req, res, url).catch(e => { console.error(e); if (!res.headersSent) send(res, 400, { error: 'Bad request.' }); });
   } else serveStatic(req, res, url);

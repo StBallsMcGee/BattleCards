@@ -1,4 +1,5 @@
-# Publishes the game to GitHub Pages so it can be played in the browser (tutorial, bots, deck builder).
+# Publishes the game to GitHub Pages so it can be played in the browser (tutorial, bots, deck builder),
+# with the phone version at /mobile/.
 # Online multiplayer needs server.js, which Pages can't run.
 name: Pages
 
@@ -25,8 +26,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
+      # The desktop game is the site root; the phone version is /mobile/ and loads the shared files from /public/.
+      - name: Assemble site
+        run: |
+          mkdir _site
+          cp -r public/. _site/
+          cp -r public _site/public
+          cp -r mobile _site/mobile
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: public
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@v4

@@ -1,0 +1,170 @@
+/* Battle Cards — phone layout (portrait 720 × 1440 stage). Loaded after ../public/css/style.css and
+ * only overrides what differs from the desktop version. Board positions come from js/layout.js. */
+
+html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+#viewport { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+#stage { width: 720px; height: 1440px; }
+#board { touch-action: none; }
+.btn { min-height: 44px; }
+.btn.big { font-size: 24px; padding: 18px 24px; }
+.btn.small { font-size: 16px; padding: 10px 14px; }
+.btn.tiny { font-size: 15px; padding: 7px 12px; min-height: 0; }
+.input, .select { font-size: 18px; padding: 12px 14px; }
+.input.small, .select.small { font-size: 16px; padding: 10px 12px; }
+
+/* Turn the phone upright */
+#rotate { display: none; position: fixed; inset: 0; z-index: 5000; background: #0f0b08; color: var(--ink); align-items: center; justify-content: center; text-align: center; font-size: 20px; }
+#rotate .rot-icon { font-size: 64px; margin-bottom: 10px; }
+@media (orientation: landscape) and (max-height: 560px) { #rotate { display: flex; } }
+
+/* ───────── Menus ───────── */
+#screen-menu { gap: 40px; }
+.menu-crest { font-size: 80px; }
+.menu-hero h1 { font-size: 68px; letter-spacing: 4px; }
+.menu-hero h2 { font-size: 20px; letter-spacing: 3px; }
+.menu-buttons { grid-template-columns: 560px; gap: 16px; }
+.menu-buttons .btn { font-size: 26px; padding: 20px 26px; }
+.menu-foot { font-size: 16px; letter-spacing: 1px; }
+.menu-foot a { color: var(--gold); }
+
+.panel-screen, .panel-screen.wide, .panel-screen.narrow { top: 12px; width: 700px; max-height: 1416px; padding: 18px 20px; -webkit-overflow-scrolling: touch; }
+.screen-head { flex-wrap: wrap; gap: 12px; }
+.screen-head h2 { font-size: 30px; }
+.cols { grid-template-columns: 1fr; gap: 18px; }
+.col h3 { font-size: 22px; }
+.deck-list, .bot-list { max-height: 520px; }
+.deck-opt, .bot-opt { padding: 14px 16px; }
+.deck-opt .dn, .bot-opt .dn { font-size: 19px; }
+.deck-opt .dd, .bot-opt .dd { font-size: 15px; }
+.setting { font-size: 19px; padding: 18px 4px; }
+.setting input[type=checkbox] { width: 30px; height: 30px; }
+.online-status { font-size: 17px; }
+
+/* Deck builder: collection on top, deck list below, two big cards per row */
+.builder { inset: 10px; }
+.builder .filters { margin-left: 0; width: 100%; flex-wrap: wrap; }
+.builder .filters .input, .builder .filters .select { flex: 1 1 45%; }
+.builder-body { flex-direction: column; gap: 10px; }
+.collection { grid-template-columns: repeat(auto-fill, 330px); gap: 12px; justify-content: center; }
+.coll-item .card { --w: 330px !important; }
+.coll-item:hover { transform: none; }
+.decklist { width: auto; height: 400px; flex: none; }
+.dl-row { font-size: 17px; padding: 8px 10px; }
+.deck-count { font-size: 21px; }
+#db-preview { display: none; }
+
+/* Rules */
+.rules-body { columns: 1; font-size: 18px; }
+.rules-body table { font-size: 16px; }
+
+/* ───────── Board ───────── */
+#opp-hand { display: none; } /* their hand size is shown in their bar */
+
+/* Player bars: avatar + name, Favour pips and piles on one line */
+.pinfo { left: 8px; height: 60px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border-radius: 12px; }
+.pinfo.opp { top: 4px; width: 580px; }
+.pinfo.me { top: 1152px; width: 482px; }
+.pi-row { flex: none; gap: 6px; }
+.pi-avatar { width: 34px; height: 34px; font-size: 22px; }
+.pi-name { font-size: 17px; max-width: 120px; }
+.pinfo.me .pi-name { max-width: 70px; }
+.pi-turn { font-size: 13px; }
+.favour { margin: 0; gap: 4px; flex: none; }
+.fav-label { display: none; }
+.fav-pips { gap: 2px; }
+.fav-pip { width: 12px; height: 12px; }
+.fav-num { font-size: 20px; }
+.pi-piles { position: static; margin-left: auto; gap: 8px; flex: none; align-items: center; }
+.pile .card { --w: 24px !important; }
+.pile b { font-size: 15px; }
+.pile.handc { font-size: 22px; }
+.empty-pile { width: 24px; height: 34px; font-size: 12px; }
+
+#btn-log { position: absolute; left: 596px; top: 10px; width: 54px; height: 48px; z-index: 30; font-size: 22px; padding: 0; }
+#btn-menu { left: 656px; top: 10px; width: 56px; height: 48px; font-size: 22px; padding: 0; }
+
+/* Support Zones: one scrolling strip each */
+.support { left: 8px; width: 704px; height: 64px; flex-direction: row; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 12px; }
+.support.opp { top: 68px; height: 64px; }
+.support.me { top: 1084px; height: 64px; }
+.zlabel { flex: none; width: 92px; margin: 0; font-size: 10px; line-height: 1.25; flex-direction: column; align-items: flex-start; gap: 0; }
+.zlabel .hint { display: none; }
+.energy-sum { font-size: 12px; flex-wrap: wrap; }
+.stiles, .stiles.dense, .stiles.denser { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; height: 100%; align-items: center; padding: 6px 4px 2px; gap: 5px; touch-action: pan-x; }
+.support .stiles .stile, .support .stiles.dense .stile, .support .stiles.denser .stile { flex: none; width: 44px; height: 52px; padding: 2px 1px; }
+.support .stiles .st-art { height: 26px; }
+.support .stiles .st-name { display: none; }
+.support .stiles .st-energy { font-size: 10px; }
+.st-shift { width: 16px; height: 16px; font-size: 10px; top: -5px; right: -4px; }
+#me-support .stile:not(.tapped):hover { transform: none; }
+
+/* Status band between the two halves: phase on the left, declared attacks on the right */
+#side { display: contents; }
+#phase-tracker { position: absolute; left: 8px; top: 584px; width: 254px; height: 48px; padding: 5px 10px; display: flex; flex-direction: column; justify-content: center; z-index: 21; border-radius: 12px; }
+.turn-label { font-size: 17px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.turn-label small { font-size: 13px; }
+.phases { gap: 0; }
+.ph { display: none; padding: 0; background: none !important; text-align: left; font-size: 14px; color: var(--gold) !important; }
+.ph.on { display: block; }
+.turn-limits { display: none; }
+#center-band { left: 270px; width: 442px; top: 584px; height: 48px; justify-content: flex-end; }
+.declared { flex-direction: column; align-items: stretch; gap: 4px; }
+.decl { font-size: 15px; padding: 6px 10px; }
+#thinking { left: 360px; top: 607px; font-size: 18px; }
+
+/* The main button sits in your bar, next to your hand */
+#side-actions { position: absolute; left: 496px; top: 1152px; width: 216px; z-index: 21; }
+#main-btn { height: 60px; font-size: 20px; padding: 0 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* The log opens over the board; tap it to close */
+#log { display: none; }
+#board.log-open #log { display: block; position: absolute; left: 8px; top: 70px; width: 704px; height: 1000px; z-index: 600; font-size: 18px; background: #120d09f5; box-shadow: 0 20px 60px #000; }
+#board.log-open #btn-log { background: var(--gold); }
+
+/* Hand: no hover lift on a touch screen; the tapped card rises instead */
+#me-hand .hand-card:hover > .card { transform: none; box-shadow: 0 0.25em 0.8em rgba(0,0,0,.55); }
+#me-hand .hand-card:hover::after { display: none; }
+#me-hand .hand-card.picked { z-index: 300 !important; }
+#me-hand .hand-card.picked > .card { transform: rotate(calc(-1 * var(--rot, 0deg))) translateY(-40px); box-shadow: 0 0 0 4px var(--gold), 0 18px 40px #000c; }
+.slot .card.picked, .stile.picked { box-shadow: 0 0 0 4px var(--gold), 0 0 24px var(--gold) !important; }
+
+/* Action menu and card preview */
+#popmenu { min-width: 460px; max-width: 640px; padding: 8px; gap: 6px; border-width: 2px; }
+.pm-item { font-size: 21px; padding: 14px 16px; border-radius: 10px; min-height: 60px; }
+.pm-cost { font-size: 18px; }
+.pm-reason { font-size: 16px; }
+#preview { width: 704px; display: flex; gap: 12px; align-items: flex-start; background: #120d09ee; border: 1px solid var(--panel-b); border-radius: 16px; padding: 10px; }
+#preview .card { margin: 0; }
+#preview .explain { flex: 1; font-size: 17px; line-height: 1.4; max-height: 420px; overflow: hidden; background: none; border: none; padding: 4px; }
+#target-hint { left: 360px; top: 72px; font-size: 20px; padding: 10px 22px; white-space: nowrap; }
+
+/* Prompts, banners, toasts, modals */
+#prompt { left: 360px; top: 607px; width: 680px; padding: 20px 22px; }
+#prompt.setup { top: 470px; width: 680px; }
+#prompt.wide { width: 700px; }
+#prompt h3 { font-size: 26px; }
+#prompt p { font-size: 18px; }
+#prompt .btn { font-size: 19px; padding: 13px 18px; }
+.pick-grid { max-height: 520px; }
+.pick-grid .btn { font-size: 19px; padding: 14px; }
+.discard-grid, .grave-grid { max-height: 760px; justify-content: center; }
+.stepper .sv { font-size: 34px; }
+.banner { left: 360px; top: 607px; font-size: 38px; }
+.banner.turn { font-size: 52px; padding: 10px 60px; }
+.banner.phase, .banner.attack-name { top: 607px; font-size: 30px; }
+.banner.favour { top: 520px; font-size: 36px; }
+#toast-layer { top: 72px; width: 680px; }
+.toast { font-size: 18px; max-width: 680px; text-align: center; }
+.modal { min-width: 0; max-width: 700px; max-height: 1300px; padding: 18px 20px; font-size: 17px; }
+.modal h3 { font-size: 26px; }
+.rules-modal { width: 660px; }
+.go-modal { min-width: 0; width: 600px; }
+.gameover h2 { font-size: 44px; }
+.pay-src { font-size: 17px; padding: 10px 12px; }
+
+/* Tutorial coach docks at the top, over the opponent's back row */
+#coach { left: 8px !important; top: 8px !important; width: 704px; max-height: 330px; overflow-y: auto; font-size: 18px; padding: 14px 18px; }
+#coach h4 { font-size: 22px; }
+#coach .coach-step { font-size: 14px; }
+#preview { width: auto; max-width: 704px; }
+#preview .explain:empty { display: none; }

@@ -428,3 +428,5 @@ code { background: rgba(255,255,255,.08); padding: 1px 6px; border-radius: 5px; 
 .favour { cursor: help; }
 .pick-grid { display: flex; flex-direction: column; gap: 6px; max-height: 300px; overflow: auto; margin-bottom: 8px; }
 .db-sets { display: flex; gap: 6px; flex-wrap: wrap; }
+.menu-foot a { color: var(--gold); }
+.phone-cta { text-decoration: none; font-size: 30px; }
