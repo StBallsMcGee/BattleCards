@@ -1,5 +1,5 @@
 # Builds the downloadable game and attaches it to the GitHub Release for the version in package.json.
-# Every push to main refreshes that release's files; bump "version" in package.json to start a new release.
+# Every push to main refreshes that release's files and notes; bump "version" in package.json to start a new release.
 name: Release
 
 on:
@@ -36,6 +36,7 @@ jobs:
           NOTES
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/battle-cards.html dist/battle-cards-mobile.html dist/battle-cards.zip --clobber
+            gh release edit "$TAG" --notes-file notes.md
           else
             gh release create "$TAG" dist/battle-cards.html dist/battle-cards-mobile.html dist/battle-cards.zip \
               --title "Battle Cards $TAG" --notes-file notes.md --target "$GITHUB_SHA" --latest

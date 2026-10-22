@@ -11,7 +11,7 @@ A browser client for **Battle Cards**, with a full rules engine, animated drag-a
 | **In the browser** | https://stballsmcgee.github.io/battlecards/ (once GitHub Pages is switched on: *Settings → Pages → Source: GitHub Actions*). |
 | **On a phone** | https://stballsmcgee.github.io/battlecards/mobile/ (see [Playing on a phone](#playing-on-a-phone)), or download [`battle-cards-mobile.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards-mobile.html). |
 
-Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). Every push to `main` runs the Release workflow, which tests and builds the game and attaches both files to the release for the version in `package.json`. To start a new release, bump `version` in `package.json`. You can also build them yourself with `npm run build` (output in `dist/`).
+Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). Every push to `main` runs the Release workflow, which tests and builds the game and attaches the files (and notes) to the release for the version in `package.json`. To start a new release, bump `version` in `package.json`. You can also build them yourself with `npm run build` (output in `dist/`).
 
 On Mac, the first time you open the `.command` file you may need to right-click it and choose **Open**, because it isn't from an identified developer.
 
