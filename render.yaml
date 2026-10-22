@@ -1,0 +1,11 @@
+# One-click hosting on Render (https://render.com): a public Battle Cards server with online play.
+# Use the "Deploy to Render" button in the README, or New → Blueprint and pick this repository.
+services:
+  - type: web
+    name: battle-cards
+    runtime: node
+    plan: free
+    buildCommand: "true"
+    startCommand: node server.js
+    healthCheckPath: /api/ping
+    autoDeploy: true

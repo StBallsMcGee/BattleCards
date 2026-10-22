@@ -28,9 +28,11 @@ jobs:
           cat > notes.md <<'NOTES'
           **Quick play:** download `battle-cards.html` and double-click it. Tutorial, bots and deck builder work offline in any modern browser.
 
+          **Play a friend:** both open the game, choose *Play Online*; one presses *Create Room* and sends the 5-letter code, the other types it and presses *Join*. No server needed.
+
           **On a phone:** open the phone version at https://stballsmcgee.github.io/battlecards/mobile/ and use *Add to Home Screen* to install it (it then works offline). Or download `battle-cards-mobile.html`.
 
-          **Full game (online play):** download `battle-cards.zip`, unzip it and run *Start Battle Cards* for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Online play needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version.
+          **Your own server (optional):** download `battle-cards.zip`, unzip it and run *Start Battle Cards* for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version.
           NOTES
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release upload "$TAG" dist/battle-cards.html dist/battle-cards-mobile.html dist/battle-cards.zip --clobber

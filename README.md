@@ -6,14 +6,46 @@ A browser client for **Battle Cards**, with a full rules engine, animated drag-a
 
 | | How |
 |---|---|
-| **Quick play (offline)** | Download [`battle-cards.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.html) and double-click it. It's one self-contained file: tutorial, bots and deck builder, no install needed. |
-| **Full game (online play)** | Download [`battle-cards.zip`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.zip), unzip it and run **Start Battle Cards** for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Online play needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version. |
+| **Quick play** | Download [`battle-cards.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.html) and double-click it. It's one self-contained file with everything, including online play with a friend (see below). No install needed. |
+| **Full game with server** | Download [`battle-cards.zip`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.zip), unzip it and run **Start Battle Cards** for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). You only need this to run your own server, which needs [Node.js](https://nodejs.org) 18+. |
 | **In the browser** | https://stballsmcgee.github.io/battlecards/ (once GitHub Pages is switched on: *Settings → Pages → Source: GitHub Actions*). |
 | **On a phone** | https://stballsmcgee.github.io/battlecards/mobile/ (see [Playing on a phone](#playing-on-a-phone)), or download [`battle-cards-mobile.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards-mobile.html). |
 
 Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). Every push to `main` runs the Release workflow, which tests and builds the game and attaches both files to the release for the version in `package.json`. To start a new release, bump `version` in `package.json`. You can also build them yourself with `npm run build` (output in `dist/`).
 
 On Mac, the first time you open the `.command` file you may need to right-click it and choose **Open**, because it isn't from an identified developer.
+
+## Playing with a friend
+
+You don't need a server. The two browsers connect directly to each other.
+
+1. Both of you open the game, in any of these ways:
+   - the web link (https://stballsmcgee.github.io/battlecards/, or `/mobile/` on a phone),
+   - the downloaded `battle-cards.html` / `battle-cards-mobile.html`,
+   - your own server.
+
+   You can mix them, for example a phone against a laptop.
+2. **You:** choose **Play Online**, pick a deck and press **Create Room**. A 5-letter code appears. Send it to your friend, and keep that screen open.
+3. **Your friend:** chooses **Play Online**, picks a deck, types the code and presses **Join**. The game starts for both of you.
+
+The person who creates the room hosts the game: the rules run in their browser, and the friend's browser only receives what that player is allowed to see. If the friend's connection drops, they reconnect automatically and carry on. If the host closes their tab, the game ends. Both of you need an internet connection.
+
+**If it won't connect:**
+- **"No room with that code":** check the code, and make sure the host is still on the Create Room screen.
+- **"Could not connect to your friend":** some school, office and public Wi-Fi networks block direct connections. Try a phone hotspot or home Wi-Fi.
+- **On a phone:** keep the game open and the screen on. Locking the phone or switching apps can drop the connection.
+
+The players are introduced to each other by PeerJS's free public matchmaking service (`0.peerjs.com`). The game itself goes directly between the two browsers. If a network blocks direct connections, the game relays through a free public relay server.
+
+### Using your own server instead
+
+You can use your own server if you'd rather (for example on a network without internet access).
+
+- **Same Wi-Fi:** run the launcher, or `node server.js`. It prints two addresses, and your friend opens the **Same Wi-Fi** one (for example `http://192.168.1.23:8080`) on their device.
+  - If it doesn't load, allow Node.js through your computer's firewall. Windows asks the first time.
+  - Under **Play Online**, both of you tick **Connect through this server instead**.
+- **A public server:** [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/StBallsMcGee/battlecards) gives you a free hosted copy of the game, with its own address that anyone can open.
+  - It uses `render.yaml`. Render's free plan sleeps when idle, so the first visit takes about a minute to wake it.
 
 ## Playing on a phone
 
@@ -27,7 +59,7 @@ The `mobile/` folder is a second version of the game laid out for phones held up
   1. Open `…/mobile/` on GitHub Pages, or on your own server (see below).
   2. Choose **Add to Home Screen** (Safari's share menu on iPhone, Chrome's ⋮ menu on Android).
   3. The game then opens full-screen like an app and works offline: it caches every file and card image the first time it loads.
-- **Online play** from a phone works when the server is running: open `http://<server>:8080/mobile/`. Phone and desktop players can play each other.
+- **Online play** works the same as on a computer (see [Playing with a friend](#playing-with-a-friend)). Phone and desktop players can play each other.
 - **Desktop link:** the desktop menu links to the phone version, and shows a big button when it's opened on a phone.
 
 How it works: `public/js/ui.js` takes its board positions from a layout object. The desktop layout is the default, and `mobile/js/layout.js` replaces it with a portrait 720×1440 board and turns on touch behaviour. `mobile/css/mobile.css` restyles the menus and panels for a narrow screen.
@@ -43,7 +75,7 @@ node server.js            # → http://localhost:8080
 PORT=3000 node server.js  # use a different port
 ```
 
-Open the address in a browser and choose **Play Online → Create Room**. Your opponent opens the same address, chooses **Join** and types the 4-letter room code. To play over the internet, run `server.js` on any Node host (a VPS, Render, Railway, Fly.io and so on) and share its URL.
+It prints the address for this computer and the address other devices on your Wi-Fi can use. To play through the server, both players open it, go to **Play Online** and tick **Connect through this server instead**. For a public server, see [Using your own server instead](#using-your-own-server-instead).
 
 ## Features
 
@@ -56,7 +88,7 @@ Open the address in a browser and choose **Play Online → Create Room**. Your o
   - **Gladiator** (Medium): plays greedily for expected damage and kills.
   - **Champion** (Hard): plans pairs of attacks, avoids counterattacks, saves energy for its own reactions, retreats dying units, pairs characters for Favour and manages its deck size.
 - **Deck builder**: filter and search cards, check deck legality, save decks in the browser, and export or import decks as codes.
-- **Online**: the server runs the engine for both players, and each player only receives what they are allowed to see. A reconnecting player gets the current board and the game log.
+- **Online**: play a friend anywhere with a 5-letter room code. The browsers connect directly (WebRTC), so no server is needed. The host's browser runs the engine, and each player only receives what they are allowed to see. A reconnecting player gets the current board and the game log. The optional server (`server.js`) does the same job for players who use its address.
 
 ## Project layout
 
@@ -79,6 +111,9 @@ tools/build.js         builds dist/battle-cards.html and battle-cards-mobile.htm
 launchers/             start scripts included in the zip
 .github/workflows/     Release (downloads) and Pages (play in browser) automation
 public/js/sets/        the five concept-doc deck sets
+public/js/p2p.js       online play without a server (direct browser-to-browser)
+public/js/vendor/      PeerJS 1.5.5 (MIT), used by p2p.js
+render.yaml            one-click hosting on Render
 mobile/                phone version: index.html, css/mobile.css, js/layout.js (portrait board),
                        sw.js + manifest.webmanifest (install & offline), icons/
 tools/gen-icons.js     renders the app icons from mobile/icons/icon.svg

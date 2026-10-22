@@ -2,10 +2,10 @@
  * from ../public and every card illustration, then serves them from the cache (refreshing in
  * the background) so the game opens and plays without a connection. */
 'use strict';
-const CACHE = 'battle-cards-mobile-v1';
+const CACHE = 'battle-cards-mobile-v2';
 const SHARED = '../public/';
 const SCRIPTS = ['sets/elementals.js', 'sets/bureau.js', 'sets/apex.js', 'sets/octo.js', 'sets/hollowing.js', 'cards.js', 'engine.js',
-  'bots.js', 'render.js', 'sound.js', 'ui.js', 'controllers.js', 'tutorial.js', 'deckbuilder.js', 'rules.js', 'main.js'];
+  'bots.js', 'render.js', 'sound.js', 'ui.js', 'controllers.js', 'tutorial.js', 'deckbuilder.js', 'rules.js', 'vendor/peerjs.min.js', 'p2p.js', 'main.js'];
 const CORE = ['./', 'index.html', 'css/mobile.css', 'js/layout.js', 'js/mobile.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png',
   SHARED + 'css/style.css'].concat(SCRIPTS.map(s => SHARED + 'js/' + s));
 

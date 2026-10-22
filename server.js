@@ -187,7 +187,30 @@ setInterval(() => {
   for (const [code, room] of rooms) if (now - room.touched > ROOM_TTL) rooms.delete(code);
 }, 10 * 60 * 1000).unref();
 
+/** Addresses other devices on the same network can use to reach this computer. */
+function lanAddresses() {
+  const out = [];
+  for (const list of Object.values(require('os').networkInterfaces())) {
+    for (const a of list || []) if ((a.family === 'IPv4' || a.family === 4) && !a.internal) out.push(a.address);
+  }
+  return out;
+}
+
 if (require.main === module) {
-  server.listen(PORT, () => console.log('Battle Cards server running on http://localhost:' + PORT));
+  server.on('error', e => {
+    if (e.code === 'EADDRINUSE') {
+      console.error('Port ' + PORT + ' is already in use — Battle Cards may already be running (check your other windows).\n' +
+        'To use a different port: PORT=8081 node server.js   (Windows: set PORT=8081 && node server.js)');
+    } else console.error('Could not start the server:', e.message);
+    process.exit(1);
+  });
+  server.listen(PORT, () => {
+    const lan = lanAddresses();
+    console.log('Battle Cards server is running.\n');
+    console.log('  On this computer:      http://localhost:' + PORT + '   (phone layout: /mobile/)');
+    for (const ip of lan) console.log('  Same Wi-Fi / network:  http://' + ip + ':' + PORT);
+    console.log('\nFriends on the same Wi-Fi can open the second address. If it does not load, allow Node.js through your firewall.');
+    console.log('Friends elsewhere: you don\'t need this server. Use Play Online → Create Room on the GitHub Pages site or the downloaded file.');
+  });
 }
 module.exports = { server, rooms };

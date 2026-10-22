@@ -66,9 +66,9 @@
         <div class="panel-screen">
           <header class="screen-head"><button class="btn subtle" data-go="menu">← Back</button><h2>Play Online</h2></header>
           <div id="online-unavailable" class="notice hidden">
-            Online play needs the Battle Cards server. Start it with <code>node server.js</code> in the project folder,
-            then open <code>http://localhost:8080</code> (or your server's address) and share it with your opponent.
+            Online play needs an internet connection and an up-to-date browser (Chrome, Safari, Firefox or Edge).
           </div>
+          <p class="muted online-how">Create a room, send the code to your friend, and they join with it, from anywhere, on a computer or phone. No server or setup needed.</p>
           <div id="online-body" class="cols">
             <div class="col">
               <h3>Your name</h3>
@@ -83,6 +83,7 @@
               <h3 style="margin-top:26px">Join a match</h3>
               <div class="row"><input id="online-code" class="input code" maxlength="5" placeholder="CODE"><button id="online-join" class="btn">Join</button></div>
               <div id="online-status" class="online-status"></div>
+              <label id="online-via-server" class="setting hidden"><span>Connect through this server instead<br><small class="muted">Only if your friend is using this same address (same Wi-Fi or a hosted server).</small></span><input id="online-server" type="checkbox"></label>
             </div>
           </div>
         </div>
@@ -166,6 +167,8 @@
   <script src="../public/js/tutorial.js"></script>
   <script src="../public/js/deckbuilder.js"></script>
   <script src="../public/js/rules.js"></script>
+  <script src="../public/js/vendor/peerjs.min.js"></script>
+  <script src="../public/js/p2p.js"></script>
   <script src="../public/js/main.js"></script>
   <script src="js/mobile.js"></script>
 </body>

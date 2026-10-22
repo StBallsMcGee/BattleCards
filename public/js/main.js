@@ -55,7 +55,11 @@
   }
 
   // ───────── online ─────────
-  let poll = null;
+  // Two ways to play online: directly browser-to-browser (BCP2P, works anywhere, the default) or through
+  // server.js when this page is served by it (for players on the same Wi-Fi or a hosted server).
+  let poll = null, lobby = null, serverOk = false;
+  const viaServer = () => serverOk && $('#online-server').checked;
+  function leaveLobby() { clearInterval(poll); if (lobby) { lobby.cancel(); lobby = null; } }
   async function api(path, body) {
     const r = await fetch('api/' + path, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {});
     return r.json();
@@ -64,10 +68,12 @@
     $('#online-name').value = UI.settings.name && UI.settings.name !== 'Player' ? UI.settings.name : '';
     deckOptions($('#online-decks'), state.onlineDeck, id => { state.onlineDeck = id; });
     $('#online-status').innerHTML = '';
-    let ok = false;
+    serverOk = false;
     if (location.protocol.startsWith('http')) {
-      try { ok = (await api('ping')).ok; } catch (e) { ok = false; }
+      try { serverOk = !!(await api('ping')).ok; } catch (e) { serverOk = false; }
     }
+    $('#online-via-server').classList.toggle('hidden', !serverOk);
+    const ok = serverOk || window.BCP2P.available();
     $('#online-unavailable').classList.toggle('hidden', ok);
     $('#online-body').style.opacity = ok ? 1 : 0.4;
     $('#online-body').style.pointerEvents = ok ? 'auto' : 'none';
@@ -91,8 +97,26 @@
       } catch (e) { /* keep polling */ }
     }, 1000);
   }
+  function p2pFailed(msg) {
+    lobby = null;
+    $('#online-status').innerHTML = '<span style="color:#ff9b8a">' + R.esc(msg) + '</span>';
+  }
   async function createRoom() {
+    leaveLobby();
     const deck = Decks.get(state.onlineDeck);
+    if (!viaServer()) {
+      $('#online-status').textContent = 'Opening a room…';
+      lobby = window.BCP2P.host({
+        name: onlineName(), deck: deck.cards,
+        onCode: code => {
+          $('#online-status').innerHTML = 'Room code<div class="big-code">' + code + '</div>Send this code to your friend. ' +
+            'They open Battle Cards, choose <b>Play Online</b>, type the code and press <b>Join</b>.<br><small class="muted">Keep this screen open until they join.</small>';
+        },
+        onError: p2pFailed,
+        onStart: () => { lobby = null; go('game'); },
+      });
+      return;
+    }
     const r = await api('rooms', { name: onlineName(), deck: deck.cards });
     if (r.error) return UI.toast(r.error, 'error');
     $('#online-status').innerHTML = 'Room code<div class="big-code">' + r.room + '</div>Share this code with your opponent. Waiting for them to join…';
@@ -101,7 +125,13 @@
   async function joinRoom() {
     const code = $('#online-code').value.trim().toUpperCase();
     if (!code) return UI.toast('Enter a room code.', 'error');
+    leaveLobby();
     const deck = Decks.get(state.onlineDeck);
+    if (!viaServer()) {
+      $('#online-status').textContent = 'Connecting to your friend…';
+      lobby = window.BCP2P.join({ code, name: onlineName(), deck: deck.cards, onError: p2pFailed, onStart: () => { lobby = null; go('game'); } });
+      return;
+    }
     const r = await api('rooms/' + code + '/join', { name: onlineName(), deck: deck.cards });
     if (r.error) return UI.toast(r.error, 'error');
     $('#online-status').textContent = 'Joined! Starting…';
@@ -130,7 +160,7 @@
   }
 
   // ───────── boot ─────────
-  $$('[data-go]').forEach(b => b.addEventListener('click', () => { window.BCSound.play('click'); clearInterval(poll); go(b.dataset.go); }));
+  $$('[data-go]').forEach(b => b.addEventListener('click', () => { window.BCSound.play('click'); leaveLobby(); go(b.dataset.go); }));
   $('#play-start').onclick = startBotGame;
   $('#online-create').onclick = createRoom;
   $('#online-join').onclick = joinRoom;
