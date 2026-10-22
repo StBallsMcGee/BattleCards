@@ -168,7 +168,8 @@
   window.BCDeckBuilder.bind();
 
   // Link to the phone version (mobile/ next to this page; ../mobile/ in a checked-out copy). Phones get a big button.
-  if (!UI.layout.touch && !window.BCArt) {
+  const inDesktopApp = /Electron/.test(navigator.userAgent);
+  if (!UI.layout.touch && !window.BCArt && !inDesktopApp) {
     const href = location.protocol === 'file:' ? '../mobile/index.html' : 'mobile/';
     $('.menu-foot').insertAdjacentHTML('beforeend', ' · <a class="phone-link" href="' + href + '">📱 phone version</a>');
     const phone = window.matchMedia && matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 700;

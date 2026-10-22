@@ -6,6 +6,7 @@ A browser client for **Battle Cards**, with a full rules engine, animated drag-a
 
 | | How |
 |---|---|
+| **Desktop app** | **Windows:** download `Battle-Cards-Setup-<version>.exe` from the [Releases page](https://github.com/StBallsMcGee/battlecards/releases/latest) and run it. It installs Battle Cards with a Start-menu and desktop shortcut. The `…-portable.exe` runs without installing. **Mac:** the `.dmg`. **Linux:** the `.AppImage`. See [Desktop app](#desktop-app). |
 | **Quick play** | Download [`battle-cards.html`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.html) and double-click it. It's one self-contained file with everything, including online play with a friend (see below). No install needed. |
 | **Full game with server** | Download [`battle-cards.zip`](https://github.com/StBallsMcGee/battlecards/releases/latest/download/battle-cards.zip), unzip it and run **Start Battle Cards** for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). You only need this to run your own server, which needs [Node.js](https://nodejs.org) 18+. |
 | **In the browser** | https://stballsmcgee.github.io/battlecards/ (once GitHub Pages is switched on: *Settings → Pages → Source: GitHub Actions*). |
@@ -14,6 +15,28 @@ A browser client for **Battle Cards**, with a full rules engine, animated drag-a
 Downloads live on the [Releases page](https://github.com/StBallsMcGee/battlecards/releases). Every push to `main` runs the Release workflow, which tests and builds the game and attaches the files (and notes) to the release for the version in `package.json`. To start a new release, bump `version` in `package.json`. You can also build them yourself with `npm run build` (output in `dist/`).
 
 On Mac, the first time you open the `.command` file you may need to right-click it and choose **Open**, because it isn't from an identified developer.
+
+**Running the Windows batch file** (only needed for your own server):
+1. Right-click `battle-cards.zip` and choose **Extract All…**. Running the file from inside the zip doesn't work, because Windows opens it without the rest of the folder.
+2. In the extracted folder, double-click **Start Battle Cards (Windows).bat**.
+3. If Windows shows "Windows protected your PC", click **More info → Run anyway**.
+4. A black window opens and shows the server's addresses, and the game opens in your browser. Keep that window open while you play; closing it stops the server.
+5. The server needs [Node.js](https://nodejs.org) (the LTS version). Without it, the batch file opens the game directly instead, and Play Online still works there.
+
+## Desktop app
+
+The `desktop/` folder wraps the game in [Electron](https://www.electronjs.org/), so it installs and runs like any other program: in its own window, with an icon and a Start-menu entry, and with no browser or Node.js needed. It contains the same game as `public/`, including Play Online with a friend.
+
+- **Windows:** `Battle-Cards-Setup-<version>.exe` is an installer. You choose the folder, and it adds Start-menu and desktop shortcuts and appears in *Add or remove programs*. `Battle-Cards-<version>-portable.exe` is a single file that runs without installing.
+- **Mac:** open the `.dmg` and drag Battle Cards into Applications.
+- **Linux:** make the `.AppImage` executable and run it.
+- **F11** toggles full screen.
+
+The apps aren't code-signed (that needs a paid certificate), so the first launch shows a warning:
+- **Windows:** "Windows protected your PC". Click **More info → Run anyway**.
+- **Mac:** right-click the app, choose **Open**, then **Open** again.
+
+Every release builds the apps automatically on GitHub's Windows, Mac and Linux machines (the `desktop` job in `.github/workflows/release.yml`). To build one yourself: `cd desktop && npm install && npm run dist`. It builds for the system you're on, and the output goes to `desktop/dist/`. `npm start` runs the app without packaging it.
 
 ## Playing with a friend
 
@@ -114,6 +137,7 @@ public/js/sets/        the five concept-doc deck sets
 public/js/p2p.js       online play without a server (direct browser-to-browser)
 public/js/vendor/      PeerJS 1.5.5 (MIT), used by p2p.js
 render.yaml            one-click hosting on Render
+desktop/               desktop app (Electron): main.js, packaging config in package.json
 mobile/                phone version: index.html, css/mobile.css, js/layout.js (portrait board),
                        sw.js + manifest.webmanifest (install & offline), icons/
 tools/gen-icons.js     renders the app icons from mobile/icons/icon.svg

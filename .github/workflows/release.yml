@@ -32,6 +32,8 @@ jobs:
 
           **On a phone:** open the phone version at https://stballsmcgee.github.io/battlecards/mobile/ and use *Add to Home Screen* to install it (it then works offline). Or download `battle-cards-mobile.html`.
 
+          **Desktop app:** Windows: run `Battle-Cards-Setup-<version>.exe` to install (or use the `portable` .exe, no install). Mac: open the `.dmg` and drag Battle Cards to Applications. Linux: the `.AppImage`. The apps aren't code-signed, so Windows shows "Windows protected your PC" (click *More info* → *Run anyway*) and macOS needs right-click → *Open* the first time.
+
           **Your own server (optional):** download `battle-cards.zip`, unzip it and run *Start Battle Cards* for your system (Windows `.bat`, Mac `.command`, Linux `start.sh`). Needs [Node.js](https://nodejs.org) 18+; without it the launcher opens the offline version.
           NOTES
           if gh release view "$TAG" >/dev/null 2>&1; then
@@ -41,3 +43,35 @@ jobs:
             gh release create "$TAG" dist/battle-cards.html dist/battle-cards-mobile.html dist/battle-cards.zip \
               --title "Battle Cards $TAG" --notes-file notes.md --target "$GITHUB_SHA" --latest
           fi
+
+  # Installable desktop apps, built on each operating system and attached to the same release.
+  desktop:
+    needs: release
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci
+      - name: Build the app
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npm run dist
+      - name: Attach to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="v$(node -p "require('../package.json').version")"
+          shopt -s nullglob
+          files=(dist/*.exe dist/*.dmg dist/*.AppImage)
+          echo "Uploading: ${files[*]}"
+          gh release upload "$TAG" "${files[@]}" --clobber

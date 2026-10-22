@@ -1,0 +1,93 @@
+{
+  "name": "battle-cards-desktop",
+  "productName": "Battle Cards",
+  "version": "1.2.0",
+  "description": "Battle Cards — Gladiators of the Multiverse",
+  "author": "Callum",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "copy-game": "node copy-game.js",
+    "start": "npm run copy-game && electron .",
+    "dist": "npm run copy-game && electron-builder --publish never"
+  },
+  "devDependencies": {
+    "electron": "44.5.1",
+    "electron-builder": "26.15.3"
+  },
+  "build": {
+    "appId": "io.github.stballsmcgee.battlecards",
+    "productName": "Battle Cards",
+    "artifactName": "Battle-Cards-${version}-${os}-${arch}.${ext}",
+    "files": [
+      "main.js",
+      "game/**/*",
+      "build/icon.png"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Battle Cards",
+      "artifactName": "Battle-Cards-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Battle-Cards-${version}-portable.${ext}"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.card-games",
+      "identity": "-"
+    },
+    "dmg": {
+      "artifactName": "Battle-Cards-${version}-mac.${ext}"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "category": "Game",
+      "syncDesktopName": true
+    },
+    "appImage": {
+      "artifactName": "Battle-Cards-${version}-linux.${ext}"
+    },
+    "publish": null
+  },
+  "repository": "https://github.com/StBallsMcGee/battlecards",
+  "desktopName": "battle-cards.desktop"
+}

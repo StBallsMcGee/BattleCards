@@ -2,8 +2,7 @@
 # Starts the Battle Cards server (needed for online play) and opens the game in your browser.
 cd "$(dirname "$0")"
 if ! command -v node >/dev/null 2>&1; then
-  echo "Node.js is not installed, so online play is unavailable. Opening the offline version instead."
-  echo "Install Node.js from https://nodejs.org to play online."
+  echo "Node.js is not installed, so the server can't start. Opening the game directly instead (Play Online still works there)."
   open "Play Offline.html"
   exit 0
 fi
